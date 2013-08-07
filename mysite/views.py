@@ -19,6 +19,9 @@ def index(request):
     print(os.path.join(ABSOLUTE_PROJECT_DIR, 'static'))
     return HttpResponse("Hello World")
 
+def welcome(request):
+    return HttpResponse("Welcome to ultimate link budget.")
+
 
 def deploy(request):
     """
