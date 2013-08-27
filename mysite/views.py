@@ -4,6 +4,7 @@ import sys
 import os
 
 from django.http import HttpResponse
+from django.shortcuts import render
 
 
 ABSOLUTE_PROJECT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
@@ -26,7 +27,10 @@ def index(request):
 
 
 def welcome(request):
-    return HttpResponse("Welcome to ultimate link budget.")
+    """
+    A Welcome page
+    """
+    return render(request, "base.html")
 
 
 def deploy(request):

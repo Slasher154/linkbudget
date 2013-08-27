@@ -2,23 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a3d577e8-b42b-4a75-96cb-499c18eca308" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dataSources.ids" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/.name" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/templates/base.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/mysite.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/other.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/scopes/scope_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/testrunner.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/thanatv.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mysite/settings.py" afterPath="$PROJECT_DIR$/mysite/settings.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mysite/urls.py" afterPath="$PROJECT_DIR$/mysite/urls.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mysite/views.py" afterPath="$PROJECT_DIR$/mysite/views.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MOVED" beforePath="D:\mydjangosite\mysite\templates\base.html" afterPath="$PROJECT_DIR$/mysite/templates/base.html" />
     </list>
     <ignored path="mysite.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -26,15 +13,15 @@
     <file path="/models.py" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1375689245647" ignored="false" />
     <file path="/a.dummy" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1375956089428" ignored="false" />
     <file path="/Python Console" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1375689861278" ignored="false" />
-    <file path="/views.py" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1375965411412" ignored="false" />
-    <file path="/urls.py" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1375943291615" ignored="false" />
+    <file path="/views.py" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1377579346715" ignored="false" />
+    <file path="/urls.py" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1377579670433" ignored="false" />
     <file path="/web.config" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1375784443959" ignored="false" />
     <file path="/deploy.py" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1375842227044" ignored="false" />
-    <file path="/Dummy.txt" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1377577099087" ignored="false" />
+    <file path="/Dummy.txt" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1377596635446" ignored="false" />
     <file path="/.gitignore" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1375867076761" ignored="false" />
     <file path="/fragment.py" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1375948589242" ignored="false" />
     <file path="/linkbudget" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1375966949119" ignored="false" />
-    <file path="/base.html" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1377578879308" ignored="false" />
+    <file path="/base.html" changelist="a3d577e8-b42b-4a75-96cb-499c18eca308" time="1377597890592" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,7 +52,7 @@
       <file leaf-file-name="urls.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mysite/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="0" selection-start="822" selection-end="822" vertical-scroll-proportion="0.0">
+            <state line="10" column="30" selection-start="278" selection-end="278" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -81,9 +68,18 @@
         </entry>
       </file>
       <file leaf-file-name="base.html" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/templates/base.html">
+        <entry file="file://$PROJECT_DIR$/mysite/templates/base.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="4" column="25" selection-start="144" selection-end="144" vertical-scroll-proportion="0.13627255">
+            <state line="56" column="102" selection-start="2192" selection-end="2192" vertical-scroll-proportion="1.7984031">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="jumbotron.css" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/mysite/static/mysite/jumbotron.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="4" column="1" selection-start="126" selection-end="126" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -110,7 +106,7 @@
       <file leaf-file-name="views.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mysite/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="59" column="0" selection-start="1287" selection-end="1287" vertical-scroll-proportion="0.0">
+            <state line="31" column="7" selection-start="636" selection-end="636" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -136,22 +132,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/blog/models.py" />
-        <option value="$PROJECT_DIR$/blog/views.py" />
-        <option value="$PROJECT_DIR$/mysite/deploy.py" />
         <option value="$PROJECT_DIR$/deploy.py" />
         <option value="$PROJECT_DIR$/web.config" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/static/web.config" />
-        <option value="$PROJECT_DIR$/mysite/urls.py" />
         <option value="$PROJECT_DIR$/mysite/views2.py" />
-        <option value="$PROJECT_DIR$/mysite/views.py" />
         <option value="dbtable:/a115be5b/7bb4aa02-54ea-4fe1-88e1-c03dc514bf03/linkbudget.public.auth_user_groups" />
         <option value="dbtable:/a115be5b/7bb4aa02-54ea-4fe1-88e1-c03dc514bf03/linkbudget.public.auth_user_id_seq" />
         <option value="dbtable:/a115be5b/7bb4aa02-54ea-4fe1-88e1-c03dc514bf03/linkbudget.public.auth_user" />
         <option value="db-console:/a115be5b/7bb4aa02-54ea-4fe1-88e1-c03dc514bf03/" />
         <option value="$PROJECT_DIR$/mysite/settings.py" />
         <option value="$PROJECT_DIR$/templates/base.html" />
+        <option value="$PROJECT_DIR$/mysite/views.py" />
+        <option value="$PROJECT_DIR$/mysite/urls.py" />
+        <option value="$PROJECT_DIR$/mysite/templates/base2.html" />
+        <option value="$PROJECT_DIR$/mysite/templates/jumbotron.css" />
+        <option value="$PROJECT_DIR$/mysite/templates/base.html" />
       </list>
     </option>
   </component>
@@ -206,40 +202,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mysite" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mysite" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mysite" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mysite" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mysite" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="templates" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
       <pane id="Scope">
         <subPane subId="All">
           <PATH>
@@ -268,6 +230,94 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="static" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="templates" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="static" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -275,14 +325,14 @@
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="60" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
-    <property name="recentsLimit" value="5" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="61" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="recentsLimit" value="5" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
     <property name="last_opened_file_path" value="$APPLICATION_HOME_DIR$/lib/postgresql-9.2-1002.jdbc4.jar" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="145" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="576" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="481" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="576" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="57" />
     <property name="WebServerToolWindowPanel.toolwindow.highlight.mappings" value="true" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="52" />
@@ -300,8 +350,8 @@
     <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.highlight.symlinks" value="true" />
-    <property name="dynamic.classpath" value="false" />
     <property name="options.searchVisible" value="true" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="PublishConfig" serverName="MyServer" serverId="ea090c57-52db-40a8-8a81-9f39eac5cadd" uploadOnCheckin="ea090c57-52db-40a8-8a81-9f39eac5cadd" showDifferentInSync="false">
     <servers>
@@ -330,6 +380,8 @@
       <recent name="D:\mydjangosite\mysite\mysite\static\mysite" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\mydjangosite\mysite\mysite\static\mysite" />
+      <recent name="D:\mydjangosite\mysite\mysite\templates" />
       <recent name="D:\mydjangosite\mysite" />
     </key>
   </component>
@@ -370,29 +422,6 @@
       <option name="PARAMETERS" value="" />
       <method />
     </configuration>
-    <configuration default="true" type="tests" factoryName="Unittests">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="mysite" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="CLASS_NAME" value="" />
-      <option name="METHOD_NAME" value="" />
-      <option name="FOLDER_NAME" value="" />
-      <option name="TEST_TYPE" value="TEST_SCRIPT" />
-      <option name="PATTERN" value="" />
-      <option name="USE_PATTERN" value="false" />
-      <option name="PUREUNITTEST" value="true" />
-      <option name="PARAMS" value="" />
-      <option name="USE_PARAM" value="false" />
-      <method />
-    </configuration>
     <configuration default="true" type="Python.DjangoServer" factoryName="Django server">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -416,6 +445,29 @@
       <option name="customRunCommand" value="" />
       <method />
     </configuration>
+    <configuration default="true" type="tests" factoryName="Unittests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="mysite" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="PUREUNITTEST" value="true" />
+      <option name="PARAMS" value="" />
+      <option name="USE_PARAM" value="false" />
+      <method />
+    </configuration>
     <configuration default="true" type="tests" factoryName="Doctests">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -434,6 +486,13 @@
       <option name="TEST_TYPE" value="TEST_SCRIPT" />
       <option name="PATTERN" value="" />
       <option name="USE_PATTERN" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugSession" factoryName="Remote" singleton="true">
+      <JSRemoteDebuggerConfigurationSettings>
+        <option name="engineId" />
+        <option name="fileUrl" />
+      </JSRemoteDebuggerConfigurationSettings>
       <method />
     </configuration>
     <configuration default="true" type="com.intellij.persistence.run.ConsoleRunConfigurationType" factoryName="Query Language Console">
@@ -515,7 +574,11 @@
       <created>1375867767521</created>
       <updated>1375867767521</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Add references to bootstrap and jquery static files. Also add welcome page.">
+      <created>1377579151732</created>
+      <updated>1377579151732</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TodoView" selected-index="2">
@@ -540,22 +603,22 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-4" y="-4" width="1608" height="868" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32823366" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23439667" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24839126" sideWeight="0.7444751" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24839126" sideWeight="0.74723756" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17696267" sideWeight="0.7656033" order="5" side_tool="false" content_ui="tabs" x="662" y="188" width="275" height="483" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17696267" sideWeight="0.76421636" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15765765" sideWeight="0.35220996" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15765765" sideWeight="0.35220996" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31154382" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15765765" sideWeight="0.3922652" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15765765" sideWeight="0.39364642" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32823366" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25552487" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25276244" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871014" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2815534" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32947233" sideWeight="0.7656033" order="6" side_tool="false" content_ui="tabs" x="653" y="141" width="450" height="529" />
-      <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.49652296" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22299169" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -608,7 +671,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add welcome page." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add references to bootstrap and jquery static files. Also add welcome page." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -624,6 +687,7 @@
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
     <MESSAGE value="Initial Commit" />
     <MESSAGE value="Add welcome page." />
+    <MESSAGE value="Add references to bootstrap and jquery static files. Also add welcome page." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -634,18 +698,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/web.config">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="27" selection-start="609" selection-end="609" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/Python27/Lib/site-packages/django/contrib/admin/forms.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="64" selection-start="1359" selection-end="1359" vertical-scroll-proportion="0.95228213" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/static/web.config">
       <provider selected="true" editor-type-id="text-editor">
         <state line="11" column="16" selection-start="330" selection-end="330" vertical-scroll-proportion="0.0">
@@ -726,12 +778,12 @@
             <node x="" y="">7bb4aa02-54ea-4fe1-88e1-c03dc514bf03.table:linkbudget.public.django_admin_log_id_seq</node>
             <node x="" y="">7bb4aa02-54ea-4fe1-88e1-c03dc514bf03.table:linkbudget.public.auth_user_user_permissions_id_seq</node>
             <node x="" y="">7bb4aa02-54ea-4fe1-88e1-c03dc514bf03.table:linkbudget.public.django_content_type</node>
-            <node x="" y="">7bb4aa02-54ea-4fe1-88e1-c03dc514bf03.table:linkbudget.public.django_content_type_id_seq</node>
             <node x="" y="">7bb4aa02-54ea-4fe1-88e1-c03dc514bf03.table:linkbudget.public.auth_permission</node>
+            <node x="" y="">7bb4aa02-54ea-4fe1-88e1-c03dc514bf03.table:linkbudget.public.django_content_type_id_seq</node>
             <node x="" y="">7bb4aa02-54ea-4fe1-88e1-c03dc514bf03.table:linkbudget.public.django_session</node>
-            <node x="" y="">7bb4aa02-54ea-4fe1-88e1-c03dc514bf03.table:linkbudget.public.auth_group</node>
-            <node x="" y="">7bb4aa02-54ea-4fe1-88e1-c03dc514bf03.table:linkbudget.public.django_site_id_seq</node>
             <node x="" y="">7bb4aa02-54ea-4fe1-88e1-c03dc514bf03.table:linkbudget.public.auth_user_id_seq</node>
+            <node x="" y="">7bb4aa02-54ea-4fe1-88e1-c03dc514bf03.table:linkbudget.public.django_site_id_seq</node>
+            <node x="" y="">7bb4aa02-54ea-4fe1-88e1-c03dc514bf03.table:linkbudget.public.auth_group</node>
             <node x="" y="">7bb4aa02-54ea-4fe1-88e1-c03dc514bf03.table:linkbudget.public.django_site</node>
             <node x="" y="">7bb4aa02-54ea-4fe1-88e1-c03dc514bf03.table:linkbudget.public.auth_user_groups_id_seq</node>
           </nodes>
@@ -747,20 +799,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mysite/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="0" selection-start="822" selection-end="822" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mysite/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="59" column="0" selection-start="1287" selection-end="1287" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mysite/settings.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="131" column="5" selection-start="4850" selection-end="4850" vertical-scroll-proportion="0.0">
@@ -768,9 +806,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/base.html">
+    <entry file="file://$PROJECT_DIR$/mysite/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="25" selection-start="144" selection-end="144" vertical-scroll-proportion="0.13627255">
+        <state line="31" column="7" selection-start="636" selection-end="636" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mysite/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="30" selection-start="278" selection-end="278" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mysite/static/mysite/jumbotron.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="1" selection-start="126" selection-end="126" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mysite/templates/base.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="102" selection-start="2192" selection-end="2192" vertical-scroll-proportion="1.7984031">
           <folding />
         </state>
       </provider>
