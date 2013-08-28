@@ -1,0 +1,165 @@
+{% extends "linkbudget/base.html" %}
+{% load staticfiles %}
+{% block content %}
+
+    <!--
+        <div class="row text-center text-danger">
+            <div class="col-lg-4"></div>
+            <div class="col-lg-4">Satellite Info</div>
+            <div class="col-lg-4"></div>
+        </div>
+        <div class="row text-center text-danger">
+            <div class="col-lg-4"></div>
+            <div class="col-lg-4">Satellite Pic</div>
+            <div class="col-lg-4"></div>
+        </div>
+        <div class="row text-center text-success">
+            <div class="col-lg-2">Uplink Info</div>
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-lg-3">Uplink Pic</div>
+                    <div class="col-lg-6">Modem Pic</div>
+                    <div class="col-lg-3">Downlink Pic</div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3"></div>
+                    <div class="col-lg-6">Modem Info</div>
+                    <div class="col-lg-3"></div>
+                </div>
+            </div>
+            <div class="col-lg-2">Downlink Info</div>
+        </div>
+        -->
+
+    <div class="row text-center">
+        <div class="col-lg-12">
+            <h1>Click on each element to input the parameters.</h1>
+
+            <div>
+                <h3>Select what you want to find >>
+                    <select class="input-lg">
+                        <option>Capacity / Information Rate</option>
+                        <option>Bandwidth</option>
+                        <option>Antenna Size</option>
+                        <option>BUC Size</option>
+                        <option>Service Coverage</option>
+                    </select>
+                </h3>
+            </div>
+            <!-- Image to be clicked -->
+            <img src="{% static "linkbudget/satellite_comm.gif" %}" alt="Click on the elements to input parameters"
+                 usemap="#maps"/>
+            <!-- Create mappings -->
+            <map id="maps" name="maps">
+                <area shape="rect" coords="103,0,336,85" id="satellite" alt="satellite"
+                      title="satellite" data-toggle="modal" href="#satellite_modal"/>
+                <area shape="rect" coords="5,101,141,249" id="uplink" alt="uplink"
+                      title="uplink" data-toggle="modal" href="#uplink_modal"/>
+                <area shape="rect" coords="298,101,434,249" id="downlink" alt="downlink"
+                      title="downlink" data-toggle="modal" href="#downlink_modal"/>
+                <area shape="rect" coords="166,123,282,236" id="modem" alt="modem"
+                      title="modem" data-toggle="modal" href="#modem_modal"/>
+            </map>
+        </div>
+    </div>
+
+
+    <!-- Satellite and beams Selection Modal -->
+    <div class="modal fade" id="satellite_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Pick your satellite and beams</h4>
+                </div>
+                <div class="modal-body">
+                    <p>IPSTAR</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <!-- Uplink Selection Modal -->
+    <div class="modal fade" id="uplink_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Configure your uplink site</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Gateway list</p>
+                    <select class="input-lg">
+                        <option>IPSTAR Gateway</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <!-- Downlink Selection Modal -->
+    <div class="modal fade" id="downlink_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Configure your downlink site</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Antenna Size</p>
+                    <p>BUC Size</p>
+                    <p>Location</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <!-- Modem Selection Modal -->
+    <div class="modal fade" id="modem_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Pick your modem</h4>
+                </div>
+                <div class="modal-body">
+                    <p>IPSTAR Modem</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('area').click(function () {
+                var element = $(this).attr('id');
+                //alert(element + " is clicked!!");
+
+            });
+        });
+    </script>
+{% endblock %}
