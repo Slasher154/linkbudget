@@ -8,8 +8,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a3d577e8-b42b-4a75-96cb-499c18eca308" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mysite/templates/progress.html" afterPath="$PROJECT_DIR$/mysite/templates/progress.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mysite/views.py" afterPath="$PROJECT_DIR$/mysite/views.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="mysite.iws" />
@@ -709,7 +707,11 @@
       <created>1380891105184</created>
       <updated>1380891105184</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Complete the progress page">
+      <created>1380894993063</created>
+      <updated>1380894993063</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TodoView" selected-index="2">
@@ -801,7 +803,8 @@
     <MESSAGE value="Add link to linkbudget page from welcome homepage." />
     <MESSAGE value="Add model of project progress" />
     <MESSAGE value="Add page project progress" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add page project progress" />
+    <MESSAGE value="Complete the progress page" />
+    <option name="LAST_COMMIT_MESSAGE" value="Complete the progress page" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
