@@ -711,7 +711,11 @@
       <created>1380894993063</created>
       <updated>1380894993063</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Complete the progress page">
+      <created>1380895010172</created>
+      <updated>1380895010172</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TodoView" selected-index="2">
