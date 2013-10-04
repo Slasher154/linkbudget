@@ -30,7 +30,7 @@ def welcome(request):
     """
     A Welcome page
     """
-    return render(request, "base.html")
+    return render(request, "welcome.html")
 
 
 def deploy(request):
@@ -54,6 +54,12 @@ def deploy(request):
     # that's all
     print "Bye!"
     return HttpResponse("Deployment finished")
+
+
+def progress(request):
+    """A project progress page"""
+    return render(request, "progress.html")
+
 
 
 def run(command, exit_on_error=True):

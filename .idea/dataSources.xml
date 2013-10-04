@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" hash="23898941">
-    <data-source source="LOCAL" name="Django default" product="" version="" jdbc-version="" driver-name="" driver-version="" uuid="f9d96995-1a1a-407c-bb38-1757e3ffa4e8">
+    <data-source source="LOCAL" name="Django default" uuid="f9d96995-1a1a-407c-bb38-1757e3ffa4e8">
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://127.0.0.1:5432/linkbudget</jdbc-url>
       <user-name>postgres</user-name>
@@ -15,8 +15,7 @@
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="linkbudget" product="PostgreSQL" version="9.2.4" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.2 JDBC4 (build 1002)" uuid="7bb4aa02-54ea-4fe1-88e1-c03dc514bf03">
-      <identifier-quote-string>&quot;</identifier-quote-string>
+    <data-source source="LOCAL" name="linkbudget" uuid="7bb4aa02-54ea-4fe1-88e1-c03dc514bf03">
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost/linkbudget</jdbc-url>

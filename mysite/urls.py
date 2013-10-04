@@ -12,6 +12,9 @@ urlpatterns = patterns('',
                        url(r'^$', views.welcome, name='welcome'),
                        url(r'^index/$', views.index, name='home'),
                        url(r'^deploy/$', views.deploy, name='deploy'),
+                       url(r'^progress/$', views.progress, name='progress'),
+
+                       # Include URLs for link budget applications
                        url(r'^linkbudget/', include('linkbudget.urls')),
 
                        # Uncomment the admin/doc line below to enable admin documentation:
