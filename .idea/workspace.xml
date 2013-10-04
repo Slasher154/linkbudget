@@ -8,9 +8,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a3d577e8-b42b-4a75-96cb-499c18eca308" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mysite/admin.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mysite/models.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/linkbudget/models.py" afterPath="$PROJECT_DIR$/linkbudget/models.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mysite/templates/progress.html" afterPath="$PROJECT_DIR$/mysite/templates/progress.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mysite/views.py" afterPath="$PROJECT_DIR$/mysite/views.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
@@ -112,30 +109,30 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="views.py" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="views.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mysite/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="62" column="71" selection-start="1386" selection-end="1386" vertical-scroll-proportion="0.0" vertical-offset="2" max-vertical-offset="697">
+            <state line="64" column="24" selection-start="1411" selection-end="1411" vertical-scroll-proportion="0.57423973" vertical-offset="172" max-vertical-offset="850">
               <folding>
                 <element signature="e#24#34#0" expanded="true" />
-                <element signature="e#273#612#0" expanded="false" />
-                <element signature="e#273#346#1" expanded="false" />
-                <element signature="e#641#671#1" expanded="false" />
-                <element signature="e#742#1215#0" expanded="false" />
-                <element signature="e#742#796#1" expanded="false" />
-                <element signature="e#1431#1546#0" expanded="false" />
-                <element signature="e#1581#1608#0" expanded="false" />
+                <element signature="e#310#649#0" expanded="false" />
+                <element signature="e#310#383#1" expanded="false" />
+                <element signature="e#678#708#1" expanded="false" />
+                <element signature="e#779#1252#0" expanded="false" />
+                <element signature="e#779#833#1" expanded="false" />
+                <element signature="e#1832#1947#0" expanded="false" />
+                <element signature="e#1982#2009#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="progress.html" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="progress.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mysite/templates/progress.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="24" column="90" selection-start="1051" selection-end="1051" vertical-scroll-proportion="0.76547843" vertical-offset="0" max-vertical-offset="731">
+            <state line="14" column="35" selection-start="508" selection-end="508" vertical-scroll-proportion="-9.153846" vertical-offset="0" max-vertical-offset="748">
               <folding>
-                <element signature="e#1018#1050#0" expanded="true" />
+                <element signature="e#1085#1117#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -175,8 +172,8 @@
         <option value="$PROJECT_DIR$/linkbudget/models.py" />
         <option value="$PROJECT_DIR$/mysite/admin.py" />
         <option value="$PROJECT_DIR$/mysite/models.py" />
-        <option value="$PROJECT_DIR$/mysite/views.py" />
         <option value="$PROJECT_DIR$/mysite/templates/progress.html" />
+        <option value="$PROJECT_DIR$/mysite/views.py" />
       </list>
     </option>
   </component>
@@ -399,9 +396,6 @@
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
-      <PyConsoleSettings />
-    </option>
-    <option name="myDjangoConsoleState">
       <PyConsoleSettings />
     </option>
   </component>
@@ -711,7 +705,11 @@
       <created>1380887592625</created>
       <updated>1380887592649</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Add page project progress">
+      <created>1380891105184</created>
+      <updated>1380891105184</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TodoView" selected-index="2">
@@ -802,7 +800,8 @@
     <MESSAGE value="Create link budget input page." />
     <MESSAGE value="Add link to linkbudget page from welcome homepage." />
     <MESSAGE value="Add model of project progress" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add model of project progress" />
+    <MESSAGE value="Add page project progress" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add page project progress" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -918,27 +917,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mysite/views.py">
+    <entry file="file://$PROJECT_DIR$/mysite/templates/progress.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="62" column="71" selection-start="1386" selection-end="1386" vertical-scroll-proportion="0.0" vertical-offset="2" max-vertical-offset="697">
+        <state line="14" column="35" selection-start="508" selection-end="508" vertical-scroll-proportion="-9.153846" vertical-offset="0" max-vertical-offset="748">
           <folding>
-            <element signature="e#24#34#0" expanded="true" />
-            <element signature="e#273#612#0" expanded="false" />
-            <element signature="e#273#346#1" expanded="false" />
-            <element signature="e#641#671#1" expanded="false" />
-            <element signature="e#742#1215#0" expanded="false" />
-            <element signature="e#742#796#1" expanded="false" />
-            <element signature="e#1431#1546#0" expanded="false" />
-            <element signature="e#1581#1608#0" expanded="false" />
+            <element signature="e#1085#1117#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mysite/templates/progress.html">
+    <entry file="file://$PROJECT_DIR$/mysite/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="90" selection-start="1051" selection-end="1051" vertical-scroll-proportion="0.76547843" vertical-offset="0" max-vertical-offset="731">
+        <state line="64" column="24" selection-start="1411" selection-end="1411" vertical-scroll-proportion="0.57423973" vertical-offset="172" max-vertical-offset="850">
           <folding>
-            <element signature="e#1018#1050#0" expanded="true" />
+            <element signature="e#24#34#0" expanded="true" />
+            <element signature="e#310#649#0" expanded="false" />
+            <element signature="e#310#383#1" expanded="false" />
+            <element signature="e#678#708#1" expanded="false" />
+            <element signature="e#779#1252#0" expanded="false" />
+            <element signature="e#779#833#1" expanded="false" />
+            <element signature="e#1832#1947#0" expanded="false" />
+            <element signature="e#1982#2009#0" expanded="false" />
           </folding>
         </state>
       </provider>

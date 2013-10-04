@@ -6,6 +6,7 @@ from mysite.models import Progress
 
 from django.http import HttpResponse
 from django.shortcuts import render
+from datetime import date, timedelta
 
 
 ABSOLUTE_PROJECT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
@@ -60,7 +61,15 @@ def deploy(request):
 def progress(request):
     """A project progress page"""
     progresses = Progress.objects.all()
-    return render(request, 'progress.html', {"progresses": progresses})
+    start_date = date(2013, 9, 30)
+    start_date_list = []
+    stop_date_list = []
+    for p in progresses:
+        start_date_list.append(start_date + timedelta(weeks=p.week-1))
+        stop_date_list.append(start_date + timedelta(weeks=p.week-1, days=4))
+    progresses_with_dates = zip(progresses, start_date_list, stop_date_list)
+    return render(request, 'progress.html',
+                  {"progresses": progresses_with_dates})
 
 
 def run(command, exit_on_error=True):

@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block content %}
@@ -15,9 +16,9 @@
                     <th>Remarks</th>
                 </tr>
                 </thead>
-                {% for p in progresses %}
+                {% for p, start, stop in progresses %}
                     <tr>
-                        <td>{{ p.week }}</td>
+                        <td>{{ p.week }} <br />({{ start|date:"d M"}}-{{  stop|date:"d M" }})</td>
                         <td>{{ p.actions }}</td>
                         <td>
                             <div class="progress">
