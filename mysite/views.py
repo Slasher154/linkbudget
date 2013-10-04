@@ -2,6 +2,7 @@ __author__ = 'thanatv'
 
 import sys
 import os
+from mysite.models import Progress
 
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -30,7 +31,7 @@ def welcome(request):
     """
     A Welcome page
     """
-    return render(request, "welcome.html")
+    return render(request, 'welcome.html')
 
 
 def deploy(request):
@@ -58,8 +59,8 @@ def deploy(request):
 
 def progress(request):
     """A project progress page"""
-    return render(request, "progress.html")
-
+    progresses = Progress.objects.all()
+    return render(request, 'progress.html', {"progresses": progresses})
 
 
 def run(command, exit_on_error=True):

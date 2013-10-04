@@ -1,10 +1,37 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block content %}
+    <h3>Link budget website progress</h3>
     <div class="panel panel-primary">
-        <div class="panel-heading">Project Progress</div>
+        <div class="panel-heading"><i class="glyphicon glyphicon-tasks"></i> Project Progress</div>
         <div class="panel-body">
-            Panel content
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Week</th>
+                    <th>Actions</th>
+                    <th>% Progress</th>
+                    <th>Status</th>
+                    <th>Remarks</th>
+                </tr>
+                </thead>
+                {% for p in progresses %}
+                    <tr>
+                        <td>{{ p.week }}</td>
+                        <td>{{ p.actions }}</td>
+                        <td>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" aria-valuenow="{{ p.percent }}" aria-valuemin="0"
+                                     aria-valuemax="100" style="width: {{ p.percent }}%;">
+                                    <span class="sr-only">{{ p.percent }}% Complete</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ p.status }}</td>
+                        <td>{{ p.remarks }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
         </div>
     </div>
 
