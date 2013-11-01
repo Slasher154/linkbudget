@@ -9,6 +9,15 @@ POLARIZATION_CHOICES = (
     ('RHCP', 'RHCP'),
 )
 
+ANTENNA_POLARIZATION_CHOICES = (
+    ('H Only', 'H'),
+    ('V Only', 'V'),
+    ('H & V', 'Linear'),
+    ('LHCP Only', 'LHCP'),
+    ('RHCP Only', 'RHCP'),
+    ('LHCP & RHCP', 'Circular')
+)
+
 BEAM_TYPE_CHOICES = (
     ('Broadcast', 'Broadcast')
         ('Spot', 'Spot'),
@@ -132,10 +141,74 @@ class Channel(models.Model):
     downlink_beam = models.ForeignKey(DownlinkBeam)
     transponder = models.ForeignKey(Transponder)
     bandwidth = models.FloatField()
-    center_frequency = models.FloatField(help_text="Unit is in GHz.")
+    center_frequency = models.FloatField(help_text="Unit is in GHz")
     CHANNEL_TYPE_CHOICES = (
         ('Forward', 'Forward'),
         ('Return', 'Return'),
         ('Broadcast', 'Broadcast')
     )
     type = models.CharField(max_length=30, choices=CHANNEL_TYPE_CHOICES)
+
+
+class Antenna(models.Model):
+    """
+    Represents an antenna
+    """
+    name = models.CharField(max_length=50)
+    vendor = models.CharField(max_length=50)
+    diameter = models.FloatField()
+    minimum_elevation = models.FloatField(help_text="The minimum value possible is 0 degrees")
+    maximum_elevation = models.FloatField(help_text="The maximum value possible is 90 degrees")
+    ANTENNA_TYPE_CHOICE = (
+        ('Parabolic', 'Parabolic'),
+        ('Phased Array', 'Phased Array'),
+    )
+    type = models.CharField(max_length=30, choices=ANTENNA_TYPE_CHOICE)
+    gains = models.ManyToManyField(AntennaGain, verbose_name="Gain", help_text="Antenna gain at each frequency")
+    gts = models.ManyToManyField(AntennaGT, verbose_name="G/T", help_text="Antenna G/T at each frequency and elevation"
+                                                                          " angle")
+    transmit_bands = models.ManyToManyField(TransmitBand, help_text="Transmit frequency and polarization of this"
+                                                                    "antenna")
+    receive_bands = models.ManyToManyField(ReceiveBand, help_text="Receive frequency and polarization of this antenna")
+
+
+class AntennaGain(models.Model):
+    """
+    Represents an antenna gain at each frequency
+    """
+    frequency = models.FloatField(help_text="Frequency which antenna gain is measured (GHz)")
+    value = models.FloatField(help_text="Gain value in dB")
+
+
+class AntennaGT(models.Model):
+    """
+    Represents an antenna G/T at each frequency and elevation angle
+    """
+    frequency = models.FloatField(help_text="Frequency which antenna G/T is measured (GHz)")
+    elevation_angle = models.FloatField(help_text="Elevation angle which antenna G/T is measured (degrees)")
+    value = models.FloatField(help_text="G/T value in dB/K")
+
+
+class TransmitBand(models.Model):
+    """
+    Represents a transmit band and polarization for an antenna
+    """
+    start_frequency = models.FloatField(help_text="Start frequency of the transmit range")
+    stop_frequency = models.FloatField(help_text="Stop frequency of the transmit range")
+    polarization = models.CharField(max_length=10, choices=ANTENNA_POLARIZATION_CHOICES)
+
+
+class ReceiveBand(models.Model):
+    """
+    Represents a receive band and polarization for an antenna
+    """
+    start_frequency = models.FloatField(help_text="Start frequency of the receive range")
+    stop_frequency = models.FloatField(help_text="Stop frequency of the receive range")
+    polarization = models.CharField(max_length=10, choices=ANTENNA_POLARIZATION_CHOICES)
+
+
+class Station(models.Model):
+    """
+    Represents a user terminal. Consists of antenna, HPA and location
+    """
+    pass
