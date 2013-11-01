@@ -207,8 +207,32 @@ class ReceiveBand(models.Model):
     polarization = models.CharField(max_length=10, choices=ANTENNA_POLARIZATION_CHOICES)
 
 
+class Hpa(models.Model):
+    """
+    Represents a high power amplifier for the earth station. Also represents user terminal 's BUC.
+    """
+    name = models.CharField(max_length=50)
+    output_power = models.FloatField(help_text="Saturated output power in Watts")
+    output_backoff = models.CharField(help_text="Default output backoff (dB)")
+    c_im3 = models.FloatField("C/3IM", help_text="C/3IM at output backoff. Leave it blank for BUC", default=50)
+    npr = models.FloatField("NPR", help_text="NPR at output backoff. Leave it blank for BUC", default=50)
+    upc = models.FloatField("UPC", help_text="Default UPC for this amplifier")
+    ifl = models.FloatField("IFL", help_text="Loss between amplifier output and antenna feed")
+
+
+class Location(models.Model):
+    name = models.CharField(max_length=50)
+    latitude = models.FloatField(help_text="Latitude is between -90 to 90 degrees")
+    longitude = models.FloatField(help_text="Longitude is between -180 to 180 degrees")
+    notes = models.CharField(max_length=1000, help_text="Additional notes for this location", blank=True)
+
+
 class Station(models.Model):
     """
-    Represents a user terminal. Consists of antenna, HPA and location
+    Represents a user terminal. Consists of antenna, power amplifier, and location
     """
-    pass
+    antenna = models.ForeignKey(Antenna, verbose_name="Antenna", help_text="Antenna of this station")
+    hpa = models.ForeignKey(Hpa, verbose_name="Power Amplifier", help_text="Power amplifier of this station")
+    location = models.ForeignKey(Location)
+
+
