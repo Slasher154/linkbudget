@@ -2,11 +2,14 @@ __author__ = 'thanatv'
 
 import sys
 import os
-from mysite.models import Progress
+import json
+from mysite.models import Progress, Parent
 
 from django.http import HttpResponse
 from django.shortcuts import render
 from datetime import date, timedelta
+from django.core import serializers
+from custom_functions import JSONSerializer
 
 
 ABSOLUTE_PROJECT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
@@ -65,11 +68,21 @@ def progress(request):
     start_date_list = []
     stop_date_list = []
     for p in progresses:
-        start_date_list.append(start_date + timedelta(weeks=p.week-1))
-        stop_date_list.append(start_date + timedelta(weeks=p.week-1, days=4))
+        start_date_list.append(start_date + timedelta(weeks=p.week - 1))
+        stop_date_list.append(start_date + timedelta(weeks=p.week - 1, days=4))
     progresses_with_dates = zip(progresses, start_date_list, stop_date_list)
     return render(request, 'progress.html',
                   {"progresses": progresses_with_dates})
+
+
+def testjson(request):
+    #data = serializers.serialize("json", Progress.objects.all())
+    #data = json.dumps(Progress.objects.all())
+    serializer = JSONSerializer()
+    data1 = serializer.serialize(Progress.objects.all())
+    qset = Parent.objects.select_related()
+    data2 = serializer.serialize(qset)
+    return render(request, 'testjson.html', {"data1": data1, "data2": data2})
 
 
 def run(command, exit_on_error=True):
@@ -82,3 +95,15 @@ def run(command, exit_on_error=True):
 def django_manage(command):
     run('manage.py ' + command)
 
+
+class Parents:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+
+class Children:
+    def __init__(self, name, age, parent):
+        self.name = name,
+        self.age = age
+        self.parent = parent

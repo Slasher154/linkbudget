@@ -13,6 +13,7 @@ urlpatterns = patterns('',
                        url(r'^index/$', views.index, name='home'),
                        url(r'^deploy/$', views.deploy, name='deploy'),
                        url(r'^progress/$', views.progress, name='progress'),
+                       url(r'^testjson/$', views.testjson, name='testjson'),
 
                        # Include URLs for link budget applications
                        url(r'^linkbudget/', include('linkbudget.urls')),

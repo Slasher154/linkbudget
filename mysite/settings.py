@@ -133,6 +133,8 @@ INSTALLED_APPS = (
     'bootstrap',
     # jQuery plugins static files
     'jquery',
+    # South application for database migration assistance
+    'south',
     # Default app
     'mysite',
     # Main application for link budget calculations
