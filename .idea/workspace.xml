@@ -8,6 +8,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a3d577e8-b42b-4a75-96cb-499c18eca308" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mysite/admin.py" afterPath="$PROJECT_DIR$/mysite/admin.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/linkbudget/models.py" afterPath="$PROJECT_DIR$/linkbudget/models.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/thanatv.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/thanatv.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
@@ -22,7 +23,7 @@
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CreatePatchCommitExecutor">
-    <option name="PATCH_PATH" value="" />
+    <option name="PATCH_PATH" value="D:\mydjangosite\mysite" />
   </component>
   <component name="DaemonCodeAnalyzer">
     <disable_hints />
@@ -50,11 +51,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="admin.py" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="admin.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mysite/admin.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="25" column="41" selection-start="603" selection-end="603" vertical-scroll-proportion="0.0" vertical-offset="425" max-vertical-offset="527">
-              <folding />
+            <state line="25" column="41" selection-start="572" selection-end="572" vertical-scroll-proportion="0.56970507" vertical-offset="0" max-vertical-offset="746">
+              <folding>
+                <element signature="e#24#56#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -62,25 +65,7 @@
       <file leaf-file-name="linkcalc.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/linkbudget/linkcalc.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="60" column="50" selection-start="2398" selection-end="2398" vertical-scroll-proportion="0.0" vertical-offset="1020" max-vertical-offset="1411">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="testjson.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mysite/templates/testjson.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="6" column="30" selection-start="177" selection-end="177" vertical-scroll-proportion="0.0" vertical-offset="102" max-vertical-offset="221">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="urls.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mysite/urls.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="0" selection-start="354" selection-end="354" vertical-scroll-proportion="0.0" vertical-offset="204" max-vertical-offset="595">
+            <state line="15" column="11" selection-start="451" selection-end="451" vertical-scroll-proportion="0.0" vertical-offset="546" max-vertical-offset="1411">
               <folding />
             </state>
           </provider>
@@ -89,38 +74,122 @@
       <file leaf-file-name="views.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mysite/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="73" column="27" selection-start="1818" selection-end="1818" vertical-scroll-proportion="0.0" vertical-offset="1241" max-vertical-offset="1938">
+            <state line="73" column="27" selection-start="1818" selection-end="1818" vertical-scroll-proportion="0.0" vertical-offset="1039" max-vertical-offset="1785">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="models.py" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="models.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/linkbudget/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="238" column="0" selection-start="8695" selection-end="8695" vertical-scroll-proportion="0.9544236" vertical-offset="2382" max-vertical-offset="3196">
+            <state line="66" column="42" selection-start="1821" selection-end="1821" vertical-scroll-proportion="-4.2" vertical-offset="779" max-vertical-offset="2465">
               <folding>
-                <marker date="1383307822288" expanded="false" signature="1129:1154" placeholder="..." />
-                <marker date="1383307822288" expanded="false" signature="1528:1619" placeholder="..." />
-                <marker date="1383307822288" expanded="true" signature="3387:3463" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+                <element signature="e#559#982#0" expanded="false" />
+                <element signature="e#559#635#1" expanded="false" />
+                <element signature="e#900#982#0" expanded="false" />
+                <element signature="e#1020#1065#1" expanded="false" />
+                <element signature="e#1626#1642#0" expanded="false" />
+                <element signature="e#1681#1722#1" expanded="false" />
+                <element signature="e#2353#2409#0" expanded="false" />
+                <element signature="e#2458#2519#1" expanded="false" />
+                <element signature="e#2810#2868#0" expanded="false" />
+                <element signature="e#2909#3200#0" expanded="false" />
+                <element signature="e#2909#2951#1" expanded="false" />
+                <element signature="e#3144#3200#0" expanded="false" />
+                <element signature="e#3251#3665#0" expanded="false" />
+                <element signature="e#3251#3314#1" expanded="false" />
+                <element signature="e#3607#3665#0" expanded="false" />
+                <element signature="e#3705#4318#0" expanded="false" />
+                <element signature="e#3705#3781#1" expanded="false" />
+                <element signature="e#4262#4318#0" expanded="false" />
+                <element signature="e#4365#4918#0" expanded="false" />
+                <element signature="e#4365#4454#1" expanded="false" />
+                <element signature="e#4851#4918#0" expanded="false" />
+                <element signature="e#4972#5491#0" expanded="false" />
+                <element signature="e#4972#5069#1" expanded="false" />
+                <element signature="e#5384#5491#0" expanded="false" />
+                <element signature="e#5527#6372#0" expanded="false" />
+                <element signature="e#5527#5706#1" expanded="false" />
+                <element signature="e#6274#6372#0" expanded="false" />
+                <element signature="e#6414#6551#0" expanded="false" />
+                <element signature="e#6414#6459#1" expanded="false" />
+                <element signature="e#6535#6551#0" expanded="false" />
+                <element signature="e#6587#7956#0" expanded="false" />
+                <element signature="e#6587#6624#1" expanded="false" />
+                <element signature="e#7940#7956#0" expanded="false" />
+                <element signature="e#7996#8367#0" expanded="false" />
+                <element signature="e#7996#8056#1" expanded="false" />
+                <element signature="e#8295#8367#0" expanded="false" />
+                <element signature="e#8405#9027#0" expanded="false" />
+                <element signature="e#8405#8484#1" expanded="false" />
+                <element signature="e#8833#9027#0" expanded="false" />
+                <element signature="e#9068#9604#0" expanded="false" />
+                <element signature="e#9068#9142#1" expanded="false" />
+                <element signature="e#9496#9604#0" expanded="false" />
+                <element signature="e#9644#10177#0" expanded="false" />
+                <element signature="e#9644#9717#1" expanded="false" />
+                <element signature="e#10069#10177#0" expanded="false" />
+                <element signature="e#10214#10701#0" expanded="false" />
+                <element signature="e#10652#10701#0" expanded="false" />
+                <element signature="e#10737#11141#0" expanded="false" />
+                <element signature="e#11173#12416#0" expanded="false" />
+                <element signature="e#11173#11283#1" expanded="false" />
+                <element signature="e#12356#12416#0" expanded="false" />
+                <element signature="e#12452#12915#0" expanded="false" />
+                <element signature="e#12452#12546#1" expanded="false" />
+                <element signature="e#12899#12915#0" expanded="false" />
+                <element signature="e#12955#13088#0" expanded="false" />
+                <element signature="e#12955#12996#1" expanded="false" />
+                <element signature="e#13072#13088#0" expanded="false" />
+                <element signature="e#13122#13503#0" expanded="false" />
+                <element signature="e#13122#13166#1" expanded="false" />
+                <element signature="e#13455#13503#0" expanded="false" />
+                <element signature="e#13548#14720#0" expanded="false" />
+                <element signature="e#13548#13651#1" expanded="false" />
+                <element signature="e#14673#14720#0" expanded="false" />
+                <element signature="e#14768#15030#0" expanded="false" />
+                <element signature="e#14768#14839#1" expanded="false" />
+                <element signature="e#14989#15030#0" expanded="false" />
+                <element signature="e#15062#16122#0" expanded="false" />
+                <element signature="e#15062#15138#1" expanded="false" />
+                <element signature="e#16068#16122#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="custom_functions.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mysite/custom_functions.py">
+      <file leaf-file-name="tests.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/linkbudget/tests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="90" column="22" selection-start="3127" selection-end="3127" vertical-scroll-proportion="0.0" vertical-offset="1191" max-vertical-offset="3859">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="374">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="progress.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mysite/templates/progress.html">
+      <file leaf-file-name="urls.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/linkbudget/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="37" column="14" selection-start="1527" selection-end="1527" vertical-scroll-proportion="0.0" vertical-offset="198" max-vertical-offset="731">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="238">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="views.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/linkbudget/views.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="289">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="__init__.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/linkbudget/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="102">
               <folding />
             </state>
           </provider>
@@ -160,8 +229,8 @@
         <option value="$PROJECT_DIR$/mysite/views.py" />
         <option value="$PROJECT_DIR$/linkbudget/linkcalc.py" />
         <option value="$PROJECT_DIR$/mysite/settings.py" />
-        <option value="$PROJECT_DIR$/mysite/admin.py" />
         <option value="$PROJECT_DIR$/linkbudget/models.py" />
+        <option value="$PROJECT_DIR$/mysite/admin.py" />
       </list>
     </option>
   </component>
@@ -250,6 +319,30 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="mysite" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mysite" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="linkbudget" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
@@ -639,7 +732,11 @@
       <created>1383303056209</created>
       <updated>1383303056209</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Add models of hpa and location">
+      <created>1383307839258</created>
+      <updated>1383307839258</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TodoView" selected-index="2">
@@ -666,26 +763,26 @@
     <frame x="-4" y="-4" width="1608" height="868" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5274431" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32596686" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.174375" sideWeight="0.7496653" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17696267" sideWeight="0.76421636" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.6572958" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25033468" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.1575" sideWeight="0.50066936" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32825485" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23439667" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.174375" sideWeight="0.7496653" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17696267" sideWeight="0.7656033" order="5" side_tool="false" content_ui="tabs" x="662" y="188" width="275" height="483" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1575" sideWeight="0.4725569" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17696267" sideWeight="0.76421636" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1575" sideWeight="0.7496653" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5729585" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.1575" sideWeight="0.50066936" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25033468" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25033468" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32825485" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2815534" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5274431" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32947233" sideWeight="0.7656033" order="6" side_tool="false" content_ui="tabs" x="653" y="141" width="450" height="529" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871014" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3994452" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -700,20 +797,20 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871014" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.174375" sideWeight="0.7496653" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.174375" sideWeight="0.7496653" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17696267" sideWeight="0.76421636" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.6572958" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25033468" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5729585" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.1575" sideWeight="0.50066936" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25033468" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32825485" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23439667" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17696267" sideWeight="0.7656033" order="5" side_tool="false" content_ui="tabs" x="662" y="188" width="275" height="483" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.1575" sideWeight="0.7496653" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25033468" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1575" sideWeight="0.7496653" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3994452" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25033468" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
     </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -734,7 +831,8 @@
     <MESSAGE value="Complete the progress page" />
     <MESSAGE value="Coding satellite, beam and transponder models" />
     <MESSAGE value="Add models of antenna and its components" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add models of antenna and its components" />
+    <MESSAGE value="Add models of hpa and location" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add models of hpa and location" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -745,55 +843,9 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/mysite/templates/welcome.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="21" selection-start="507" selection-end="507" vertical-scroll-proportion="0.0" vertical-offset="255" max-vertical-offset="663" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/manage.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="559" />
-      </provider>
-    </entry>
-    <entry file="file://C:/Python27/Lib/site-packages/django/contrib/auth/admin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-1.1621984" vertical-offset="867" max-vertical-offset="3145" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mysite/templates/base.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="57" column="0" selection-start="2246" selection-end="2246" vertical-scroll-proportion="-20.846153" vertical-offset="427" max-vertical-offset="1190" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mysite/custom_functions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="90" column="22" selection-start="3127" selection-end="3127" vertical-scroll-proportion="0.0" vertical-offset="1191" max-vertical-offset="3859">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/Python27/Lib/site-packages/django/utils/autoreload.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="99" column="13" selection-start="3856" selection-end="3856" vertical-scroll-proportion="0.5311284" vertical-offset="1410" max-vertical-offset="2584" />
-      </provider>
-    </entry>
     <entry file="file://C:/Python27/Lib/SocketServer.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="154" column="0" selection-start="5999" selection-end="5999" vertical-scroll-proportion="0.33268481" vertical-offset="2379" max-vertical-offset="12461" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/linkbudget/linkcalc.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="60" column="50" selection-start="2398" selection-end="2398" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1411">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mysite/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="73" column="27" selection-start="1818" selection-end="1818" vertical-scroll-proportion="0.0" vertical-offset="1039" max-vertical-offset="1785">
-          <folding />
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/mysite/urls.py">
@@ -822,13 +874,6 @@
         <state line="27" column="7" selection-start="561" selection-end="561" vertical-scroll-proportion="0.6152815" vertical-offset="0" max-vertical-offset="799" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mysite/admin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="41" selection-start="603" selection-end="603" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="493">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mysite/settings.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="14" column="13" selection-start="320" selection-end="320" vertical-scroll-proportion="0.0" vertical-offset="107" max-vertical-offset="3009">
@@ -836,13 +881,144 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/mysite/custom_functions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="90" column="22" selection-start="3127" selection-end="3127" vertical-scroll-proportion="0.33452594" vertical-offset="1275" max-vertical-offset="3791">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mysite/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="73" column="27" selection-start="1818" selection-end="1818" vertical-scroll-proportion="0.0" vertical-offset="1039" max-vertical-offset="1785">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/linkbudget/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="559">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/linkbudget/linkcalc.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="11" selection-start="451" selection-end="451" vertical-scroll-proportion="0.0" vertical-offset="546" max-vertical-offset="1411">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/linkbudget/tests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="559">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/linkbudget/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="559">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/linkbudget/migrations/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="559">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/linkbudget/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="559">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/linkbudget/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="238" column="0" selection-start="8695" selection-end="8695" vertical-scroll-proportion="0.9544236" vertical-offset="2382" max-vertical-offset="3196">
+        <state line="66" column="42" selection-start="1821" selection-end="1821" vertical-scroll-proportion="-4.2" vertical-offset="779" max-vertical-offset="2465">
           <folding>
-            <marker date="1383307822288" expanded="false" signature="1129:1154" placeholder="..." />
-            <marker date="1383307822288" expanded="false" signature="1528:1619" placeholder="..." />
-            <marker date="1383307822288" expanded="true" signature="3387:3463" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <element signature="e#559#982#0" expanded="false" />
+            <element signature="e#559#635#1" expanded="false" />
+            <element signature="e#900#982#0" expanded="false" />
+            <element signature="e#1020#1065#1" expanded="false" />
+            <element signature="e#1626#1642#0" expanded="false" />
+            <element signature="e#1681#1722#1" expanded="false" />
+            <element signature="e#2353#2409#0" expanded="false" />
+            <element signature="e#2458#2519#1" expanded="false" />
+            <element signature="e#2810#2868#0" expanded="false" />
+            <element signature="e#2909#3200#0" expanded="false" />
+            <element signature="e#2909#2951#1" expanded="false" />
+            <element signature="e#3144#3200#0" expanded="false" />
+            <element signature="e#3251#3665#0" expanded="false" />
+            <element signature="e#3251#3314#1" expanded="false" />
+            <element signature="e#3607#3665#0" expanded="false" />
+            <element signature="e#3705#4318#0" expanded="false" />
+            <element signature="e#3705#3781#1" expanded="false" />
+            <element signature="e#4262#4318#0" expanded="false" />
+            <element signature="e#4365#4918#0" expanded="false" />
+            <element signature="e#4365#4454#1" expanded="false" />
+            <element signature="e#4851#4918#0" expanded="false" />
+            <element signature="e#4972#5491#0" expanded="false" />
+            <element signature="e#4972#5069#1" expanded="false" />
+            <element signature="e#5384#5491#0" expanded="false" />
+            <element signature="e#5527#6372#0" expanded="false" />
+            <element signature="e#5527#5706#1" expanded="false" />
+            <element signature="e#6274#6372#0" expanded="false" />
+            <element signature="e#6414#6551#0" expanded="false" />
+            <element signature="e#6414#6459#1" expanded="false" />
+            <element signature="e#6535#6551#0" expanded="false" />
+            <element signature="e#6587#7956#0" expanded="false" />
+            <element signature="e#6587#6624#1" expanded="false" />
+            <element signature="e#7940#7956#0" expanded="false" />
+            <element signature="e#7996#8367#0" expanded="false" />
+            <element signature="e#7996#8056#1" expanded="false" />
+            <element signature="e#8295#8367#0" expanded="false" />
+            <element signature="e#8405#9027#0" expanded="false" />
+            <element signature="e#8405#8484#1" expanded="false" />
+            <element signature="e#8833#9027#0" expanded="false" />
+            <element signature="e#9068#9604#0" expanded="false" />
+            <element signature="e#9068#9142#1" expanded="false" />
+            <element signature="e#9496#9604#0" expanded="false" />
+            <element signature="e#9644#10177#0" expanded="false" />
+            <element signature="e#9644#9717#1" expanded="false" />
+            <element signature="e#10069#10177#0" expanded="false" />
+            <element signature="e#10214#10701#0" expanded="false" />
+            <element signature="e#10652#10701#0" expanded="false" />
+            <element signature="e#10737#11141#0" expanded="false" />
+            <element signature="e#11173#12416#0" expanded="false" />
+            <element signature="e#11173#11283#1" expanded="false" />
+            <element signature="e#12356#12416#0" expanded="false" />
+            <element signature="e#12452#12915#0" expanded="false" />
+            <element signature="e#12452#12546#1" expanded="false" />
+            <element signature="e#12899#12915#0" expanded="false" />
+            <element signature="e#12955#13088#0" expanded="false" />
+            <element signature="e#12955#12996#1" expanded="false" />
+            <element signature="e#13072#13088#0" expanded="false" />
+            <element signature="e#13122#13503#0" expanded="false" />
+            <element signature="e#13122#13166#1" expanded="false" />
+            <element signature="e#13455#13503#0" expanded="false" />
+            <element signature="e#13548#14720#0" expanded="false" />
+            <element signature="e#13548#13651#1" expanded="false" />
+            <element signature="e#14673#14720#0" expanded="false" />
+            <element signature="e#14768#15030#0" expanded="false" />
+            <element signature="e#14768#14839#1" expanded="false" />
+            <element signature="e#14989#15030#0" expanded="false" />
+            <element signature="e#15062#16122#0" expanded="false" />
+            <element signature="e#15062#15138#1" expanded="false" />
+            <element signature="e#16068#16122#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mysite/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="41" selection-start="572" selection-end="572" vertical-scroll-proportion="0.56970507" vertical-offset="0" max-vertical-offset="746">
+          <folding>
+            <element signature="e#24#56#0" expanded="true" />
           </folding>
         </state>
       </provider>

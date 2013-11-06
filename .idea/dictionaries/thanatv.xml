@@ -5,14 +5,21 @@
       <w>backoff</w>
       <w>downlink</w>
       <w>eirp</w>
+      <w>hpas</w>
+      <w>hubless</w>
       <w>ipstar</w>
       <w>lhcp</w>
       <w>linearizer</w>
       <w>linkbudget</w>
       <w>mbps</w>
+      <w>msps</w>
       <w>mysite</w>
+      <w>qpsk</w>
       <w>rhcp</w>
+      <w>rolloff</w>
+      <w>scpc</w>
       <w>sspa</w>
+      <w>tdma</w>
       <w>thaicom</w>
       <w>twta</w>
       <w>uplink</w>

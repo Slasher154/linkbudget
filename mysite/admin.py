@@ -2,7 +2,7 @@ __author__ = 'thanatv'
 
 from django.contrib import admin
 from mysite.models import Parent, Child, Progress
-from linkbudget.models import UplinkBeam, UplinkDefinedContour
+from linkbudget.models import *
 
 
 class ProgressAdmin(admin.ModelAdmin):
