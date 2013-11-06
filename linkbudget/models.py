@@ -35,6 +35,9 @@ class FrequencyBand(models.Model):
     start = models.FloatField(help_text="Start frequency of this band in GHz")
     stop = models.FloatField(help_text="Stop frequency of this band in GHz")
 
+    class Meta:
+        ordering = ["start"]
+
     def __str__(self):
         return "{0}-Band ({1}-{2} GHz)".format(self.name, str(self.start), str(self.stop))
 
