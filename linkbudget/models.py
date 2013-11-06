@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator
 
 # Create your models here.
 
@@ -25,7 +26,7 @@ BEAM_TYPE_CHOICES = (
     ('Augment', 'Augment')
 )
 
-# TODO: Write comments for the models
+# TODO: Write comments and validators for the models
 
 class FrequencyBand(models.Model):
     """
@@ -67,12 +68,9 @@ class UplinkBeam(models.Model):
     Represents an uplink beam
     """
     satellite = models.ForeignKey(Satellite, null=True)
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=20)
     peak_gt = models.FloatField("Peak G/T")
     polarization = models.CharField(max_length=10, choices=POLARIZATION_CHOICES, null=True)
-    sfd_max_atten = models.FloatField("SFD at Max Atten.", help_text="SFD at max attenuation in the form of -(X+G/T). "
-                                                                     "Ex. If SFD = -(88+G/T), input '88' here",
-                                      default=0)
     type = models.CharField(max_length=20, choices=BEAM_TYPE_CHOICES, blank=True)
 
     def __str__(self):
@@ -101,7 +99,7 @@ class DownlinkBeam(models.Model):
     Represents a downlink beam
     """
     satellite = models.ForeignKey(Satellite, null=True)
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=20)
     peak_sat_eirp = models.FloatField("Peak saturated EIRP")
 
     def __str__(self):
@@ -139,6 +137,12 @@ class Transponder(models.Model):
     hpa_type = models.CharField(max_length=10, choices=HPA_TYPE_CHOICES)
     linearizer = models.BooleanField()
     dynamic_range = models.FloatField()
+    MODE_CHOICE = (
+        ('ALC', 'ALC'),
+        ('FGM', 'FGM'),
+    )
+    primary_mode = models.CharField(max_length=10, choices=MODE_CHOICE, null=True)
+    secondary_mode = models.CharField(max_length=10, choices=MODE_CHOICE, default='None')
 
     def __str__(self):
         return "{0}: {1}".format(self.satellite.name, self.name)
@@ -168,7 +172,8 @@ class TransponderCharacteristic(models.Model):
     npr = models.FloatField("NPR (dB)")
 
     def __str__(self):
-        return "{0} - IBO {1} dB / OBO {2} dB", self.transponder, str(self.input_backoff), str(self.output_backoff)
+        return "{0} - IBO {1} dB / OBO {2} dB".format(self.transponder, str(self.input_backoff),
+                                                      str(self.output_backoff))
 
 
 class Channel(models.Model):
@@ -181,7 +186,18 @@ class Channel(models.Model):
     downlink_beam = models.ForeignKey(DownlinkBeam, null=True)
     transponder = models.ForeignKey(Transponder, null=True)
     bandwidth = models.FloatField()
-    center_frequency = models.FloatField(help_text="Unit is in GHz")
+    uplink_center_frequency = models.FloatField(help_text="Uplink center frequency in GHz.")
+    downlink_center_frequency = models.FloatField(help_text="Downlink center frequency in GHz")
+    sfd_max_atten_alc = models.FloatField("SFD at Max Atten ALC.",
+                                          help_text="SFD at max channel per transponder in "
+                                                    "the form of -(X+G/T). Ex. If SFD = -(88+G/T),"
+                                                    "input '88' here",
+                                          default=0, validators=[MinValueValidator(0)])
+    sfd_max_atten_fgm = models.FloatField("SFD at Max Atten FGM.",
+                                          help_text="SFD at max channel per transponder in "
+                                                    "the form of -(X+G/T). Ex. If SFD = -(88+G/T),"
+                                                    "input '88' here",
+                                          default=0, validators=[MinValueValidator(0)])
     CHANNEL_TYPE_CHOICES = (
         ('Forward', 'Forward'),
         ('Return', 'Return'),
@@ -190,7 +206,7 @@ class Channel(models.Model):
     type = models.CharField(max_length=30, choices=CHANNEL_TYPE_CHOICES)
 
     def __str__(self):
-        return "{0} | {1} | {2}", self.uplink_beam.satellite, self.uplink_beam.name, self.transponder.name
+        return "{0} | {1} | {2}".format(self.uplink_beam.satellite, self.uplink_beam.name, self.transponder.name)
 
 
 class AntennaVendor(models.Model):
@@ -208,7 +224,7 @@ class Antenna(models.Model):
     Represents an antenna
     """
     name = models.CharField(max_length=50)
-    vendor = models.CharField(max_length=50)
+    vendor = models.ForeignKey(AntennaVendor, null=True)
     diameter = models.FloatField()
     minimum_elevation = models.FloatField(help_text="The minimum value possible is 0 degrees")
     maximum_elevation = models.FloatField(help_text="The maximum value possible is 90 degrees")

@@ -68,7 +68,7 @@ class UplinkBeamAdmin(admin.ModelAdmin):
 
 class DownlinkBeamAdmin(admin.ModelAdmin):
     inlines = [
-        DownlinkDefinedContour,
+        DownlinkDefinedContourInline,
     ]
 
 
@@ -122,7 +122,7 @@ class ModemAdmin(admin.ModelAdmin):
 
 class ModemApplicationAdmin(admin.ModelAdmin):
     inlines = [
-        AvailableSymbolRate,
+        AvailableSymbolRateInline,
         MCGInline,
     ]
 
