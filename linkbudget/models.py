@@ -137,12 +137,17 @@ class Transponder(models.Model):
     hpa_type = models.CharField(max_length=10, choices=HPA_TYPE_CHOICES)
     linearizer = models.BooleanField()
     dynamic_range = models.FloatField()
+    design_alc_deepin = models.FloatField("Designed ALC deep-in (dB)", help_text="Designed deep-in level at full-load "
+                                                                                 "for this transponder (positive "
+                                                                                 "value). Input 0 if transponder has "
+                                                                                 "only FGM mode", default=0)
+
     MODE_CHOICE = (
         ('ALC', 'ALC'),
         ('FGM', 'FGM'),
     )
-    primary_mode = models.CharField(max_length=10, choices=MODE_CHOICE, null=True)
-    secondary_mode = models.CharField(max_length=10, choices=MODE_CHOICE, default='None')
+    primary_mode = models.CharField(max_length=10, choices=MODE_CHOICE, default="None")
+    secondary_mode = models.CharField(max_length=10, choices=MODE_CHOICE, null=True)
 
     def __str__(self):
         return "{0}: {1}".format(self.satellite.name, self.name)
@@ -243,7 +248,7 @@ class Antenna(models.Model):
     #receive_bands = models.ManyToManyField(ReceiveBand, help_text="Receive frequency and polarization of this antenna")
 
     def __str__(self):
-        return self.name
+        return "{0} {1}".format(self.vendor, self.name)
 
 
 class AntennaGain(models.Model):
@@ -267,10 +272,28 @@ class AntennaGT(models.Model):
     elevation_angle = models.FloatField(help_text="Elevation angle which antenna G/T is measured (degrees)")
     value = models.FloatField(help_text="G/T value in dB/K")
 
+    class Meta:
+        verbose_name = "Antenna G/T"
 
     def __str__(self):
         return "{0} dB/K at {1} GHz at {2} degrees elevation".format(str(self.value), str(self.frequency),
                                                                      str(self.elevation_angle))
+
+
+class AntennaNoiseTemperature(models.Model):
+    """
+    Represents an antenna noise temperature at each elevation angle
+    """
+    antenna = models.ForeignKey(Antenna, null=True)
+    elevation_angle = models.FloatField(help_text="Elevation angle which noise temperature is measured (degrees)")
+    value = models.FloatField(help_text="Noise temperature value in Kelvin")
+
+    class Meta:
+        verbose_name = "Antenna Noise Temperature"
+
+
+    def __str__(self):
+        return "{0} degrees at {1} degrees elevation".format(str(self.value), str(self.elevation_angle))
 
 
 class TransmitBand(models.Model):
@@ -320,7 +343,10 @@ class Gateway(models.Model):
     purpose = models.CharField(max_length=20, choices=PURPOSE_CHOICE)
     antenna = models.ForeignKey(Antenna, null=True)
     location = models.ForeignKey(Location, null=True)
-    diversity_gateway = models.ForeignKey('self', help_text="Select the diversity gateway if any")
+    diversity_gateway = models.ForeignKey('self', help_text="Select the diversity gateway if any", blank=True, null=True)
+
+    def __str__(self):
+        return "{0}-{1} : {2}".format(self.name, self.purpose, self.location)
 
 
 class Hpa(models.Model):
@@ -337,15 +363,15 @@ class Hpa(models.Model):
     output_backoff = models.FloatField(help_text="Default output backoff (dB)")
     c_im3 = models.FloatField("C/3IM", help_text="C/3IM at output backoff. Leave it blank for BUC", default=50)
     npr = models.FloatField("NPR", help_text="NPR at output backoff. Leave it blank for BUC", default=50)
-    upc = models.FloatField("UPC", help_text="Default UPC for this amplifier")
-    ifl = models.FloatField("IFL", help_text="Loss between amplifier output and antenna feed")
+    upc = models.FloatField("UPC", help_text="Default UPC for this amplifier. Positive value")
+    ifl = models.FloatField("IFL", help_text="Loss between amplifier output and antenna feed. Negative Value.")
     channels = models.ManyToManyField(Channel, help_text="Satellite channel associated with this HPA (for HPA in"
                                                          "gateway only)")
-    gateway = models.ForeignKey(Gateway, help_text="Leave it blank if this HPA is not in the gateway", null=True)
-
+    gateway = models.ForeignKey(Gateway, help_text="Leave it blank if this HPA is not in the gateway", null=True,
+                                blank=True)
 
     def __str__(self):
-        return "{0} {1} W".format(self.name, str(self.output_power))
+        return "{0} - {1} W".format(self.name, str(int(self.output_power)))
 
 
 class Station(models.Model):

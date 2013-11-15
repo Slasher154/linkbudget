@@ -35,12 +35,18 @@ class AntennaGTInline(admin.TabularInline):
     model = AntennaGT
 
 
+class AntennaNoiseTemperatureInline(admin.TabularInline):
+    model = AntennaNoiseTemperature
+
+
 class TransmitBandInline(admin.TabularInline):
     model = TransmitBand
+    extra = 1
 
 
 class ReceiveBandInline(admin.TabularInline):
     model = ReceiveBand
+    extra = 1
 
 
 class AvailableSymbolRateInline(admin.TabularInline):
@@ -90,7 +96,8 @@ class AntennaVendorAdmin(admin.ModelAdmin):
 class AntennaAdmin(admin.ModelAdmin):
     inlines = [
         AntennaGainInline,
-        AntennaGainInline,
+        AntennaGTInline,
+        AntennaNoiseTemperatureInline,
         TransmitBandInline,
         ReceiveBandInline,
     ]
@@ -133,19 +140,11 @@ admin.site.register(Progress, ProgressAdmin)
 admin.site.register(FrequencyBand, FrequencyBandAdmin)
 admin.site.register(Satellite, SatelliteAdmin)
 admin.site.register(UplinkBeam, UplinkBeamAdmin)
-admin.site.register(UplinkDefinedContour)
 admin.site.register(DownlinkBeam, DownlinkBeamAdmin)
-admin.site.register(DownlinkDefinedContour)
 admin.site.register(Transponder, TransponderAdmin)
-admin.site.register(AlcFullLoadBackoff)
-admin.site.register(TransponderCharacteristic)
 admin.site.register(Channel, ChannelAdmin)
 admin.site.register(AntennaVendor, AntennaVendorAdmin)
 admin.site.register(Antenna, AntennaAdmin)
-admin.site.register(AntennaGain)
-admin.site.register(AntennaGT)
-admin.site.register(TransmitBand)
-admin.site.register(ReceiveBand)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(Gateway, GatewayAdmin)
 admin.site.register(Hpa, HpaAdmin)
@@ -153,5 +152,4 @@ admin.site.register(Station, StationAdmin)
 admin.site.register(ModemVendor, ModemVendorAdmin)
 admin.site.register(Modem, ModemAdmin)
 admin.site.register(ModemApplication, ModemApplicationAdmin)
-admin.site.register(AvailableSymbolRate)
-admin.site.register(MCG)
+
