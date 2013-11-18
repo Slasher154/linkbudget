@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block content %}
+    {% if result %}
+        <div class="panel panel-primary">
+            <div class="panel-heading"><i class="glyphicon glyphicon-tasks"></i> Link Budget</div>
+            <div class="panel-body">
+                <p>Uplink</p>
+                EIRP: {{ result.uplink.eirp }} dBW <br>
+                G/T: {{ result.uplink.gt }} dB/K <br>
+                Path Loss: {{ result.uplink.path_loss }} dB <br>
+                Noise BW: {{ result.uplink.noise_bw }} dB <br>
+                C/N: {{ result.uplink.cn }} dB <br>
+
+                <p>Downlink</p>
+                EIRP: {{ result.downlink.eirp }} dBW <br>
+                G/T: {{ result.downlink.gt }} dB/K <br>
+                Path Loss: {{ result.downlink.path_loss }} dB <br>
+                Noise BW: {{ result.downlink.noise_bw }} dB <br>
+                C/N: {{ result.downlink.cn }} dB <br>
+
+            </div>
+        </div>
+
+    {% endif %}
+    {% if messages %}
+        <div class="panel panel-danger">
+            <div class="panel-heading"><i class="glyphicon glyphicon-tasks"></i> Error Messages</div>
+            <div class="panel-body">
+
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
