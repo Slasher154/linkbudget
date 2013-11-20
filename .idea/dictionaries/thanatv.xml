@@ -3,11 +3,13 @@
     <words>
       <w>atten</w>
       <w>backoff</w>
+      <w>clearsky</w>
       <w>deepin</w>
       <w>downlink</w>
       <w>eirp</w>
       <w>hpas</w>
       <w>hubless</w>
+      <w>intermodulation</w>
       <w>ipstar</w>
       <w>lhcp</w>
       <w>linearizer</w>
@@ -18,12 +20,14 @@
       <w>qpsk</w>
       <w>rhcp</w>
       <w>rolloff</w>
+      <w>scin</w>
       <w>scpc</w>
       <w>sspa</w>
       <w>tdma</w>
       <w>thaicom</w>
       <w>twta</w>
       <w>uplink</w>
+      <w>xpol</w>
     </words>
   </dictionary>
 </component>
