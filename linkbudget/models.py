@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from linkcalc import LinkCalcError
+from scipy.interpolate import interp1d
 
 # Create your models here.
 
@@ -153,6 +155,50 @@ class Transponder(models.Model):
         return "{0}: {1}".format(self.satellite.name, self.name)
 
 
+    def ibo_at_specific_obo(self, requested_obo):
+        """
+        Returns input backoff of the transponder at specific output backoff
+        """
+
+        # Raises error if the transponder has no FGM mode
+        if not "FGM" in (self.primary_mode.upper(), self.secondary_mode.upper()):
+            raise LinkCalcError("Transponder {0} has no FGM mode".format(self.name))
+
+        # Raises error if requested OBO is more than zero
+        elif requested_obo > 0:
+            raise LinkCalcError("Expected output backoff of transponder {0} should be negative value.".format(self.name))
+
+        # Raises error if this transponder has no ibo/obo pair in the database
+        elif not self.transpondercharacteristic_set.exists():
+            raise LinkCalcError("There is no transponder characteristics data for transponder {0}".format(self.name))
+
+        tp_chars_queryset = self.transpondercharacteristic_set.all()
+
+        minimum_obo_ibo_pair = tp_chars_queryset.all()[0]
+        maximum_obo_ibo_pair = tp_chars_queryset.all().reverse()[0]
+
+        # If requested OBO is higher than maximum (least negative) in the database, returns an error.
+        # (Not allow to uplink to get that OBO level)
+        if requested_obo > maximum_obo_ibo_pair.output_backoff:
+            raise LinkCalcError("Expected output backoff of {0} dB is higher than transponder {1} "
+                                "characteristics at {2} dB".format(str(requested_obo), self.name,
+                                                                   str(maximum_obo_ibo_pair.output_backoff)))
+
+        # If requested OBO is lower (more negative) than the lowest in the database, assume the transfer curve is linear
+        # for all OBO lower than that.
+        if requested_obo < minimum_obo_ibo_pair.output_backoff:
+            return minimum_obo_ibo_pair.input_backoff - (minimum_obo_ibo_pair.output_backoff - requested_obo)
+
+        # If requested OBO is within IBO and OBO pairs in the database, interpolate to get the IBO
+        list1, list2 = [], []
+        for tp_char in tp_chars_queryset:
+            list1.append(tp_char.output_backoff)
+            list2.append(tp_char.input_backoff)
+        interpolated_function = interp1d(list1, list2)
+        return interpolated_function(requested_obo)
+
+
+
 class AlcFullLoadBackoff(models.Model):
     """
     Represents a default ALC mode full-load output backoff of the transponder
@@ -175,6 +221,9 @@ class TransponderCharacteristic(models.Model):
     output_backoff = models.FloatField()
     c_3im = models.FloatField("C/3IM (dB)")
     npr = models.FloatField("NPR (dB)")
+
+    class Meta:
+        ordering = ['output_backoff']
 
     def __str__(self):
         return "{0} - IBO {1} dB / OBO {2} dB".format(self.transponder, str(self.input_backoff),

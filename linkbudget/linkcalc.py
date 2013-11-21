@@ -2,6 +2,7 @@ __author__ = 'thanatv'
 
 # Main class for link calculation.
 from linkbudget.models import *
+from scipy.interpolate import interp1d
 
 # Link budget constants
 BOLTZMANN_CONSTANT = -228.6  # dBJ/K
@@ -51,7 +52,7 @@ class Link:
         # Ex. the IPSTAR return channel normally calculates with full BUC power
         # so no power optimization required.
         uplink.gt = self.channel.uplink_beam.peak_gt  # Beam peak
-        self.seek_optimized_eirp_uplink(self.channel.transponder, uplink.gt)
+        #self.seek_optimized_eirp_uplink(self.channel.transponder, uplink.gt)
 
         # ---- C/N Uplink ----
 
@@ -112,7 +113,7 @@ class Link:
 
         return self.result
 
-    def seek_optimized_eirp_uplink(self, transponder, gt_at_location, forced_operating_mode=None,
+    def seek_optimized_eirp_uplink(self, transponder, bandwidth, gt_at_location, forced_operating_mode=None,
                                    required_output_backoff=0, fca_step=0):
         """
         Seek an optimized EIRP uplink of the uplink station
@@ -136,19 +137,20 @@ class Link:
         # In FGM mode, maximum allowable EIRP is equal to an amount that drives the amplifier to get required OBO
         # Default OBO = 0 dB
         if operating_mode is "FGM":
-            # TODO Add calculation for different FCA steps
-            pass
+        # TODO Add calculation for different FCA steps
 
 
-    # Log an error if the transponder doesn't have the given operating mode
-    def validate_transponder_mode(self, transponder, operating_mode):
-        if not operating_mode in (transponder.primary_mode, transponder.secondary_mode):
-            #raise LinkCalcError("Transponder {0} doesn't have {1} mode.".format(transponder.name, operating_mode))
-            self.log_error("Transponder {0} doesn't have {1} mode.".format(transponder.name, operating_mode))
+
+        # Log an error if the transponder doesn't have the given operating mode
+
+            def validate_transponder_mode(self, transponder, operating_mode):
+                if not operating_mode in (transponder.primary_mode, transponder.secondary_mode):
+                    #raise LinkCalcError("Transponder {0} doesn't have {1} mode.".format(transponder.name, operating_mode))
+                    self.log_error("Transponder {0} doesn't have {1} mode.".format(transponder.name, operating_mode))
 
 
-    def log_error(self, message):
-        self.result.error_messages.append(message)
+        def log_error(self, message):
+            self.result.error_messages.append(message)
 
 
 class LinkResult(object):
@@ -307,10 +309,3 @@ class RainBothResult(object):
         self.ci_uplink = 0
         self.ci_downlink = 0
         self.cn_total = 0
-
-
-
-
-
-
-
