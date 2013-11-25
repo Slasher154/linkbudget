@@ -1,6 +1,8 @@
+from math import pi, log10
 from django.db import models
 from django.core.validators import MinValueValidator
 from linkcalc import LinkCalcError
+from linkcalc import SPEED_OF_LIGHT
 from scipy.interpolate import interp1d
 
 # Create your models here.
@@ -40,6 +42,13 @@ class FrequencyBand(models.Model):
 
     class Meta:
         ordering = ["start"]
+
+    @staticmethod
+    def get_frequency_band(self, frequency):
+        """
+        Returns frequency band object which given frequency is in
+        """
+        return FrequencyBand.objects.filter(start__lt=frequency, stop__gt=frequency)[0]
 
     def __str__(self):
         return "{0}-Band ({1}-{2} GHz)".format(self.name, str(self.start), str(self.stop))
@@ -166,7 +175,8 @@ class Transponder(models.Model):
 
         # Raises error if requested OBO is more than zero
         elif requested_obo > 0:
-            raise LinkCalcError("Expected output backoff of transponder {0} should be negative value.".format(self.name))
+            raise LinkCalcError(
+                "Expected output backoff of transponder {0} should be negative value.".format(self.name))
 
         # Raises error if this transponder has no ibo/obo pair in the database
         elif not self.transpondercharacteristic_set.exists():
@@ -197,6 +207,8 @@ class Transponder(models.Model):
         interpolated_function = interp1d(list1, list2)
         return interpolated_function(requested_obo)
 
+    def validate_transponder_mode(self, mode):
+        return str(mode).lower() in (self.primary_mode.lower(), self.secondary_mode.lower())
 
 
 class AlcFullLoadBackoff(models.Model):
@@ -288,16 +300,36 @@ class Antenna(models.Model):
     )
     type = models.CharField(max_length=30, choices=ANTENNA_TYPE_CHOICE)
     has_tracking = models.BooleanField(help_text="True if this antenna has satellite tracking function.", default=False)
-    #gains = models.ManyToManyField(AntennaGain, verbose_name="Gain", help_text="Antenna gain at each frequency")
-    #
-    #gts = models.ManyToManyField(AntennaGT, verbose_name="G/T", help_text="Antenna G/T at each frequency and elevation"
-    #                                                                      " angle", null=True)
-    #transmit_bands = models.ManyToManyField(TransmitBand, help_text="Transmit frequency and polarization of this"
-    #                                                                "antenna", null=True)
-    #receive_bands = models.ManyToManyField(ReceiveBand, help_text="Receive frequency and polarization of this antenna")
+
+    def gain(self, frequency):
+        """
+        Returns antenna gain at given frequency in GHz
+        """
+        return 10 * log10(self.efficiency(frequency) * (pi * self.diameter * frequency * 10 ** 9 / SPEED_OF_LIGHT) ** 2)
+
+    def efficiency(self, frequency):
+        """
+        Returns antenna efficiency at given frequency in GHz
+        """
+        band = FrequencyBand.get_frequency_band(frequency)
+        if band:
+            # Seek if there is antenna gain data at this band (from the spec sheet)
+            gain_at_frequency = self.antennagain_set.filter(frequency__gt=band.start, frequency__lt=band.stop)[0]
+
+            # If the gain data exists, calculate efficiency from that gain
+            if gain_at_frequency:
+                return 10 ** (gain_at_frequency.value/10) * (SPEED_OF_LIGHT / (pi * frequency * 10 ** 9 * self.diameter)) ** 2
+            else:
+                return 0.6
+        else:
+            raise LinkCalcError("Invalid frequency range.")
+
+
 
     def __str__(self):
         return "{0} {1}".format(self.vendor, self.name)
+
+
 
 
 class AntennaGain(models.Model):
@@ -392,7 +424,8 @@ class Gateway(models.Model):
     purpose = models.CharField(max_length=20, choices=PURPOSE_CHOICE)
     antenna = models.ForeignKey(Antenna, null=True)
     location = models.ForeignKey(Location, null=True)
-    diversity_gateway = models.ForeignKey('self', help_text="Select the diversity gateway if any", blank=True, null=True)
+    diversity_gateway = models.ForeignKey('self', help_text="Select the diversity gateway if any", blank=True,
+                                          null=True)
 
     def __str__(self):
         return "{0}-{1} : {2}".format(self.name, self.purpose, self.location)
@@ -419,6 +452,25 @@ class Hpa(models.Model):
     gateway = models.ForeignKey(Gateway, help_text="Leave it blank if this HPA is not in the gateway", null=True,
                                 blank=True)
 
+    def power_at_antenna_feed(self, ifl=None, obo=None, upc=None):
+        """
+        Returns output power at antenna feed
+        """
+        if not ifl:
+            ifl = self.ifl
+        if not obo:
+            obo = self.obo
+        if not upc:
+            upc = self.upc
+        if ifl > 0:
+            raise LinkCalcError("IFL of HPA {0} ({1} dB) should be less than zero.".format(self.name, str(ifl)))
+        if obo > 0:
+            raise LinkCalcError("OBO of HPA {0} ({1} dB) should be less than zero".format(self.name, str(obo)))
+        if upc < 0:
+            raise LinkCalcError("UPC of HPA {0} ({1} dB) should be more than zero.".format(self.name, str(upc)))
+        return 10 ** ((self.output_power + obo + ifl - upc) / 10)
+
+
     def __str__(self):
         return "{0} - {1} W".format(self.name, str(int(self.output_power)))
 
@@ -434,6 +486,12 @@ class Station(models.Model):
 
     def __str__(self):
         return self.name
+
+    def uplink_eirp(self, frequency):
+        """
+        Returns uplink EIRP of this station
+        """
+        return self.hpa.power_at_antenna_feed() + self.antenna.gain(frequency)
 
 
 class ModemVendor(models.Model):

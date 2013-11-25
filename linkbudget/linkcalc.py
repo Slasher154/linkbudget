@@ -3,6 +3,7 @@ __author__ = 'thanatv'
 # Main class for link calculation.
 from linkbudget.models import *
 from scipy.interpolate import interp1d
+from math import log10, pi
 
 # Link budget constants
 BOLTZMANN_CONSTANT = -228.6  # dBJ/K
@@ -19,7 +20,8 @@ class LinkCalcError(Exception):
 class Link:
     def __init__(self, channel, modem, bandwidth, uplink_station=None,
                  downlink_station=None, gateway=None, rain_model=None, power_optimization=True,
-                 power_overused=0, num_carriers_in_transponder=10, force_operating_mode=None):
+                 power_overused=0, num_carriers_in_transponder=10, force_operating_mode=None, force_contour=None,
+                 operating_obo=0):
         """
         Initialize the parameters required for the link budget.
         Required parameters: channel, modem and bandwidth
@@ -37,6 +39,8 @@ class Link:
         self.power_overused = power_overused
         self.num_carriers_in_transponder = num_carriers_in_transponder
         self.force_operating_mode = force_operating_mode
+        self.force_contour = force_contour
+        self.operating_obo = operating_obo
         self.result = LinkResult()
 
 
@@ -46,24 +50,73 @@ class Link:
         """
         uplink = self.result.uplink
         downlink = self.result.downlink
+        satellite = self.result.satellite
+        carrier = self.result.carrier
+        uplink_interferences = self.result.uplink_interferences
+        downlink_interferences = self.result.downlink_interferences
+
+        # Runs validation
+        try:
+            self.validate()
+        except LinkCalcError, e:
+            raise LinkCalcError("Validation error. {0}".format(e.message))
 
         # Seek the optimized uplink power. This is the default case unless
         # is_power_optimized is explicitly assigned false.
         # Ex. the IPSTAR return channel normally calculates with full BUC power
         # so no power optimization required.
         uplink.gt = self.channel.uplink_beam.peak_gt  # Beam peak
-        #self.seek_optimized_eirp_uplink(self.channel.transponder, uplink.gt)
+        carrier.bandwidth = self.bandwidth
+
+        # If the operating mode is not forced by user (which should be a normal case), use the transponder's primary
+        # mode
+        if self.forced_operating_mode:
+            satellite.channel_operating_mode = self.forced_operating_mode
+        else:
+            satellite.channel_operating_mode = self.chanel.transponder.primary_mode
+
+
 
         # ---- C/N Uplink ----
 
+
+        # Set uplink parameters
+
         # For forward or broadcast channel, check whether the uplink station is specified.
         # If not, use the default gateway of the channel
-        # If uplink station is specified, check the following for usage compatibility:
-        # 1. Antenna's transmit frequency range and polarization matches the beam
-        # 2. Uplink location is in the beam coverage
-        # Return error if requirements are not met
         if self.uplink_station and isinstance(self.uplink_station, Station):
-            pass
+            uplink_station = Station(self.uplink_station)
+            station_eirp = uplink_station.uplink_eirp(uplink.frequency)
+            uplink.ifl = uplink_station.hpa.ifl
+            uplink.hpa_obo = uplink_station.hpa.output_backoff
+            uplink.upc = uplink_station.hpa.upc
+            uplink.antenna_diameter = uplink_station.antenna.diameter
+            uplink.antenna_gain = uplink_station.antenna.gain(uplink.frequency)
+            uplink.antenna_efficiency = uplink_station.antenna.efficiency(uplink.frequency)
+
+            # Find optimized PFD if power optimization is true
+            if self.power_optimization:
+                optimized_pfd = self.seek_optimized_pfd_uplink(self.channel, carrier.bandwidth, uplink.gt,
+                                                       satellite.channel_operating_mode, self.operating_obo)
+                # TODO: Write a function for exact slant range
+                uplink.spreading_loss = self.spreading_loss(GEOSYNCHRONOUS_ALTITUDE)
+                uplink.optimized_eirp = optimized_pfd + uplink.spreading_loss
+
+                # Uplink EIRP will be limited at optimized EIRP if station has higher power
+                # Else, the station is underused power
+                if station_eirp > uplink.optimized_eirp:
+                    uplink.eirp = uplink.optimized_eirp
+                else:  # underused power
+                    uplink.eirp = station_eirp
+            else:
+                uplink.eirp = station_eirp
+
+            # Calculates power at HPA output per carrier from uplink eirp
+            uplink.hpa_output_power_per_carrier = uplink.eirp - uplink.antenna_gain - uplink.ifl + uplink.upc
+
+        # Use default gateway if specified
+        elif self.gateway and isinstance(self.gateway, Gateway):
+            gateway = Gateway(self.gateway)
 
         # Compute C/N Uplink (clear sky and rain fade)
 
@@ -113,51 +166,53 @@ class Link:
 
         return self.result
 
-    def seek_optimized_eirp_uplink(self, transponder, bandwidth, gt_at_location, forced_operating_mode=None,
-                                   required_output_backoff=0, fca_step=0):
+    def validate(self):
         """
-        Seek an optimized EIRP uplink of the uplink station
+        Validates the input parameters
         """
+        if self.num_carriers_in_transponder < 0:
+            raise LinkCalcError("Number of carriers in the transponder {0} cannot be less than zero.".format(
+                self.channel.transponder.name))
+        if self.power_overused < 0:
+            raise LinkCalcError("Power overused cannot be less than zero.")
+        if self.bandwidth > self.channel.bandwidth:
+            raise LinkCalcError(
+                "Input bandwidth ({0} MHz) is bigger than the channel bandwidth ({1}) MHz.".format(str(self.bandwidth),
+                                                                                                   str(
+                                                                                                       self.channel.bandwidth)))
+        if self.bandwidth < 0:
+            raise LinkCalcError("Input bandwidth ({0} MHz) cannot be less than zero.".format(str(self.bandwidth)))
+        if self.force_operating_mode:
+            self.channel.transponder.validate_transponder_mode(self.force_operating_mode)
 
-        # If the operating mode is not forced by user (which should be a normal case), use the transponder's primary
-        # mode
-        operating_mode = ""
-        if forced_operating_mode:
-            operating_mode = forced_operating_mode
-        else:
-            operating_mode = transponder.primary_mode
-
-        #try:
-        #    self.validate_transponder_mode(transponder, operating_mode)
-        #except LinkCalcError, err:
-        #    print err.message
-        #finally:
-        #    pass
+    def seek_optimized_pfd_uplink(self, channel, carrier_bandwidth, gt_at_location, operating_mode,
+                                  operating_obo=0, fca_step=0):
+        """
+        Seek an optimized PFD uplink of the uplink station
+        """
 
         # In FGM mode, maximum allowable EIRP is equal to an amount that drives the amplifier to get required OBO
         # Default OBO = 0 dB
         if operating_mode is "FGM":
         # TODO Add calculation for different FCA steps
+            operating_ibo = channel.transponder.ibo_at_specific_obo(operating_obo)
+            backoff_per_carrier = 10 * log10(channel.bandwidth / carrier_bandwidth)
+            sfd_channel_at_location = -(
+            channel.sfd_max_atten_fgm + gt_at_location)  # Channel SFD in the form of -(X+G/T)
+            return sfd_channel_at_location + operating_ibo - backoff_per_carrier
 
-
-
-        # Log an error if the transponder doesn't have the given operating mode
-
-            def validate_transponder_mode(self, transponder, operating_mode):
-                if not operating_mode in (transponder.primary_mode, transponder.secondary_mode):
-                    #raise LinkCalcError("Transponder {0} doesn't have {1} mode.".format(transponder.name, operating_mode))
-                    self.log_error("Transponder {0} doesn't have {1} mode.".format(transponder.name, operating_mode))
-
-
-        def log_error(self, message):
-            self.result.error_messages.append(message)
-
+    def spreading_loss(self, slant_range):
+        """
+        Computes spreading loss from slant range (km) and frequency (GHz)
+        """
+        return 10 * log10(4 * pi * (slant_range * 10**3)**2)
 
 class LinkResult(object):
     def __init__(self):
         self.uplink = UplinkResult()
         self.satellite = SatelliteResult()
         self.downlink = DownlinkResult()
+        self.carrier = CarrierResult()
         self.uplink_interferences = UplinkInterferencesResult()
         self.downlink_interferences = DownlinkInterferencesResult()
         self.clear_sky = ClearSkyResult()
@@ -197,13 +252,16 @@ class UplinkResult(object):
         self.antenna_diameter = 0
         self.antenna_efficiency = 0
         self.antenna_gain = 0
-        self.hpa_output_power = 0
+        self.hpa_full_power = 0
+        self.hpa_output_power_per_carrier = 0
         self.spreading_loss = 0
         self.relative_contour = 0
         self.gt = 0
         self.optimized_eirp = 0
         self.eirp = 0
         self.upc = 0
+        self.ifl = 0
+        self.hpa_obo = 0
         self.pfd = 0
         self.availability = 0
         self.pointing_loss = 0
@@ -227,6 +285,7 @@ class SatelliteResult(object):
         self.channel_input_backoff = 0
         self.channel_output_backoff = 0
         self.carrier_output_backoff = 0
+        self.channel_operating_mode = ""
         self.peak_saturated_eirp = 0
         self.gain_variation = 0
 
@@ -259,6 +318,11 @@ class DownlinkResult(object):
         self.gas_attenuation = 0
         self.scin_attenuation = 0
         self.rain_attenuation = 0
+
+
+class CarrierResult(object):
+    def __init__(self):
+        self.bandwidth = 0
 
 
 class UplinkInterferencesResult(object):
