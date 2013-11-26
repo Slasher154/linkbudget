@@ -65,6 +65,7 @@ class UplinkResult(object):
         self.gas_attenuation = 0
         self.scin_attenuation = 0
         self.rain_attenuation = 0
+        self.noise_bandwidth = 0
 
 
 class SatelliteResult(object):

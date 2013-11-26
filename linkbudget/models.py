@@ -44,7 +44,7 @@ class FrequencyBand(models.Model):
         ordering = ["start"]
 
     @staticmethod
-    def get_frequency_band(self, frequency):
+    def get_frequency_band(frequency):
         """
         Returns frequency band object which given frequency is in
         """
@@ -292,11 +292,21 @@ class Channel(models.Model):
     )
     type = models.CharField(max_length=30, choices=CHANNEL_TYPE_CHOICES)
 
+    def default_gateway(self):
+        """
+        Returns default gateway for this channel
+        """
+        hpa = self.hpa_set.first()
+        if hpa:
+            return hpa.gateway
+        else:
+            return None
+
     def is_forward(self):
         """
         Return true if the channel is a link from Hub to remote site
         """
-        return type in ('Forward', 'Broadcast')
+        return self.type in ('Forward', 'Broadcast')
 
     def __str__(self):
         return "{0} | {1} | {2}".format(self.uplink_beam.satellite, self.uplink_beam.name, self.transponder.name)
@@ -341,7 +351,7 @@ class Antenna(models.Model):
         band = FrequencyBand.get_frequency_band(frequency)
         if band:
             # Seek if there is antenna gain data at this band (from the spec sheet)
-            gain_at_frequency = self.antennagain_set.filter(frequency__gt=band.start, frequency__lt=band.stop)[0]
+            gain_at_frequency = self.antennagain_set.filter(frequency__gt=band.start, frequency__lt=band.stop).first()
 
             # If the gain data exists, calculate efficiency from that gain
             if gain_at_frequency:
@@ -473,9 +483,12 @@ class Gateway(models.Model):
         """
         Returns a station object used to uplink into given channel from the gateway object
         """
+        hpa = self.get_hpa_for_channel(channel)
+        if not hpa:
+            return None
         station = Station()
         station.antenna = self.antenna
-        station.hpa = self.get_hpa_for_channel(channel)
+        station.hpa = hpa
         station.location = self.location
         station.name = self.name
         return station
@@ -512,7 +525,7 @@ class Hpa(models.Model):
         if not ifl:
             ifl = self.ifl
         if not obo:
-            obo = self.obo
+            obo = self.output_backoff
         if not upc:
             upc = self.upc
         if ifl > 0:

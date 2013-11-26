@@ -1,10 +1,9 @@
 __author__ = 'thanatv'
 
 # Main class for link calculation.
-from linkbudget.models import *
 from linkbudget.result import LinkResult
-from scipy.interpolate import interp1d
 from math import log10, pi
+from linkbudget.itu_r import Attenuation
 
 
 # Link budget constants
@@ -38,6 +37,7 @@ class Link:
         self.gateway = gateway
         self.rain_model = rain_model
         self.power_optimization = power_optimization
+        self.power_optimization = power_optimization
         self.power_overused = power_overused
         self.num_carriers_in_transponder = num_carriers_in_transponder
         self.force_operating_mode = force_operating_mode
@@ -47,7 +47,8 @@ class Link:
 
     def calculate(self):
         """
-        Calculate a link budget and return a result object
+
+        :return: LinkResult
         """
         uplink = self.result.uplink
         downlink = self.result.downlink
@@ -55,6 +56,10 @@ class Link:
         carrier = self.result.carrier
         uplink_interferences = self.result.uplink_interferences
         downlink_interferences = self.result.downlink_interferences
+        clear_sky = self.result.clear_sky
+        rain_up = self.result.rain_up
+        rain_down = self.result.rain_down
+        rain_both = self.result.rain_both
 
         # Runs validation
         try:
@@ -68,27 +73,32 @@ class Link:
         # so no power optimization required.
         uplink_gt = self.channel.uplink_beam.peak_gt  # Beam peak
         uplink_frequency = self.channel.uplink_center_frequency
+        uplink_availability = 0.995
 
         # If the operating mode is not forced by user (which should be a normal case), use the transponder's primary
         # mode
-        if self.forced_operating_mode:
-            operating_mode = self.forced_operating_mode
+        if self.force_operating_mode:
+            operating_mode = self.force_operating_mode
         else:
             operating_mode = self.channel.transponder.primary_mode
 
         # ---- C/N Uplink ----
 
-
         # Set uplink parameters
 
         # For forward or broadcast channel, check whether the uplink station or gateway is specified
-        if self.uplink_station and isinstance(self.uplink_station, Station):
-            uplink_station = Station(self.uplink_station)
+        # Import the models here to prevent circular import (two module imports class from each other)
+        # http://stackoverflow.com/questions/10212929/import-error-on-django-models-py
+        from linkbudget.models import Station
+        if isinstance(self.uplink_station, Station):
+            uplink_station = self.uplink_station
 
-        # Use default gateway if specified
-        elif self.gateway and isinstance(self.gateway, Gateway) and self.channel.is_forward():
-            uplink_station = Gateway(self.gateway).convert_to_station(self.channel)
-
+        # Use default gateway if gateway is true
+        elif self.gateway and self.channel.is_forward():
+            uplink_gateway = self.channel.default_gateway()
+            uplink_station = uplink_gateway.convert_to_station(self.channel)
+            if not uplink_station:
+                raise LinkCalcError("There is no default gateway for channel {0}".format(self.channel.name))
         else:
             raise LinkCalcError("No uplink station provided.")
 
@@ -112,20 +122,31 @@ class Link:
         else:
             uplink_eirp = station_eirp
 
-        # Calculates power at HPA output per carrier from uplink eirp
-        # hpa_output_power_per_carrier = uplink_eirp - uplink_station.antenna.g - uplink.ifl + uplink.upc
+        # Calculates PFD
+        uplink_pfd = uplink_eirp - self.spreading_loss(GEOSYNCHRONOUS_ALTITUDE)
+
+        # Declare local variables for uplink station lat/lon
+        uplink_lat = uplink_station.location.latitude
+        uplink_lon = uplink_station.location.longitude
 
         # Finds uplink relative contour of the station
-        contour = self.channel.uplink_beam.get_contour(uplink_station.location.latitude, uplink_station.location.longitude)
+        uplink_contour = self.channel.uplink_beam.get_contour(uplink_lat, uplink_lon)
 
         # Calculates path losses
-        path_loss = self.path_loss(GEOSYNCHRONOUS_ALTITUDE, uplink_frequency)
+        uplink_path_loss = self.path_loss(GEOSYNCHRONOUS_ALTITUDE, uplink_frequency)
 
         # Calculates noise bandwidth
-        noise_bandwidth = self.noise_bandwidth(self.bandwidth)
+        uplink_noise_bandwidth = self.noise_bandwidth(self.bandwidth)
+
+        # Calculates atmospheric attenuation
+        uplink_atten = Attenuation(uplink_frequency, self.channel.uplink_beam.satellite.elevation_angle(uplink_lat, uplink_lon),
+                                   uplink_station.antenna.diameter, uplink_availability, uplink_lat, uplink_lon)
 
         # Compute C/N Uplink (clear sky and rain fade)
-        cn_clear = uplink_eirp + uplink_gt + contour - path_loss - noise_bandwidth - BOLTZMANN_CONSTANT
+        cn_without_atten = uplink_eirp + uplink_gt + uplink_contour - uplink_path_loss - uplink_noise_bandwidth \
+            - BOLTZMANN_CONSTANT
+        cn_clear = cn_without_atten - uplink_atten.total_clear_sky()
+        cn_rain = cn_without_atten - uplink_atten.total_rain()
 
         # Record uplink station parameters
         uplink.latitude = uplink_station.location.latitude
@@ -133,15 +154,39 @@ class Link:
         uplink.polarization = self.channel.uplink_beam.polarization
         uplink.slant_range = GEOSYNCHRONOUS_ALTITUDE
         uplink.frequency = uplink_frequency
-        uplink.elevation = self.channel.uplink_beam.satellite.elevation_angle(uplink_station.location.latitude, uplink_station.location.longitude)
+        uplink.elevation = self.channel.uplink_beam.satellite.elevation_angle(uplink_station.location.latitude,
+                                                                              uplink_station.location.longitude)
         uplink.ifl = uplink_station.hpa.ifl
         uplink.hpa_obo = uplink_station.hpa.output_backoff
         uplink.upc = uplink_station.hpa.upc
         uplink.antenna_diameter = uplink_station.antenna.diameter
+        uplink.antenna_efficiency = uplink_station.antenna.efficiency(uplink_frequency)
         uplink.antenna_gain = uplink_station.antenna.gain(uplink.frequency)
-        uplink.antenna_efficiency = uplink_station.antenna.efficiency(uplink.frequency)
-        uplink.latitude = uplink_station.location.latitude
-        uplink.longitude = uplink_station.location.longitude
+        uplink.hpa_full_power = uplink_station.hpa.output_power
+        uplink.hpa_output_power_per_carrier = uplink_eirp - uplink_station.antenna.gain(
+            uplink_frequency) - uplink_station.hpa.ifl + uplink_station.hpa.upc
+        uplink.spreading_loss = self.spreading_loss(GEOSYNCHRONOUS_ALTITUDE)
+        uplink.relative_contour = uplink_contour
+        uplink.gt = uplink_gt
+        uplink.optimized_eirp = optimized_eirp
+        uplink.eirp = uplink_eirp
+        uplink.pfd = uplink_pfd
+        uplink.availability = 0
+        uplink.pointing_loss = self.pointing_loss()
+        uplink.xpol_loss = self.xpol_loss()
+        uplink.axial_ratio_loss = self.axial_ratio_loss()
+        uplink.path_loss = uplink_path_loss
+        uplink.cloud_attenuation = uplink_atten.cloud()
+        uplink.gas_attenuation = uplink_atten.gas()
+        uplink.scin_attenuation = uplink_atten.scin()
+        uplink.rain_attenuation = uplink_atten.rain()
+        uplink.noise_bandwidth = uplink_noise_bandwidth
+
+        # Record to C/N results
+        clear_sky.cn_uplink = cn_clear
+        rain_down.cn_uplink = cn_clear
+        rain_up.cn_uplink = cn_rain
+        rain_both.cn_uplink = cn_rain
 
         # ---- C/N Downlink ----
 
@@ -209,38 +254,51 @@ class Link:
             self.channel.transponder.validate_transponder_mode(self.force_operating_mode)
 
     def seek_optimized_pfd_uplink(self, channel, carrier_bandwidth, gt_at_location, operating_mode,
-                                  operating_obo=0, fca_step=0):
+                                  operating_obo=0, atten=0):
         """
         Seek an optimized PFD uplink of the uplink station
         """
 
         # In FGM mode, maximum allowable EIRP is equal to an amount that drives the amplifier to get required OBO
         # Default OBO = 0 dB
-        if operating_mode is "FGM":
-        # TODO Add calculation for different FCA steps
+        if operating_mode == "FGM":
             operating_ibo = channel.transponder.ibo_at_specific_obo(operating_obo)
             backoff_per_carrier = 10 * log10(channel.bandwidth / carrier_bandwidth)
-            sfd_channel_at_location = -(
-                channel.sfd_max_atten_fgm + gt_at_location)  # Channel SFD in the form of -(X+G/T)
+            sfd_channel_at_location = -(  # SFD in form of -(X+G/T)-(16-Atten)
+                channel.sfd_max_atten_fgm + gt_at_location)-(channel.transponder.dynamic_range-atten)
             return sfd_channel_at_location + operating_ibo - backoff_per_carrier
+        # In ALC mode, maximum allowable is equal to an amount that drives the amplifier at desired deepin
+        else:
+            sfd_channel_at_location = -(channel.sfd_max_atten_alc + gt_at_location)
+            return sfd_channel_at_location - channel.transponder.dynamic_range + channel.transponder.design_alc_deepin
 
     def spreading_loss(self, slant_range):
         """
-        Computes spreading loss from slant range (km) and frequency (GHz)
+        Computes spreading loss from slant range (km)
         """
         return 10 * log10(4 * pi * (slant_range * 10 ** 3) ** 2)
 
     def gain_1m(self, frequency):
         """
-        Computes effective aperture of 1m antenna
+        Computes gain of 1 sq.meter (dBi/m^2)
         """
-        return 10 * log10(4 * pi * (1 / self.wavelength(frequency)))
+        return 10 * log10(4 * pi * (1 / self.wavelength(frequency) ** 2))
 
     def path_loss(self, slant_range, frequency):
         """
         Computes path loss of this link
         """
         return self.spreading_loss(slant_range) + self.gain_1m(frequency)
+
+    def pointing_loss(self):
+        # TODO: Write this function
+        return 0.6
+
+    def xpol_loss(self):
+        return 0.1
+
+    def axial_ratio_loss(self):
+        return 0
 
     def noise_bandwidth(self, bandwidth):
         """

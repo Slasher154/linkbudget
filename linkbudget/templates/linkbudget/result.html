@@ -1,13 +1,22 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block content %}
-    {% if result %}
+    {% if mystring %}
         <div class="panel panel-primary">
             <div class="panel-heading"><i class="glyphicon glyphicon-tasks"></i> Link Budget</div>
             <div class="panel-body">
-                {%  for s in mystring %}
-                <p>{{ s }}</p>
-                {% endfor %}
+                <table class="table table-bordered table-condensed">
+                    <thead>
+                        <tr>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    {% for s in mystring %}
+                        <tr>
+                            <td>{{ s }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
 
             </div>
         </div>
