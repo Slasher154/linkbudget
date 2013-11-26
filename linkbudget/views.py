@@ -21,7 +21,7 @@ def result(request):
     mychannel = Channel.objects.filter(name="207-FWD")[0]
     mytp = Transponder.objects.filter(name="1G")[0]
     mylink = Link(mychannel, None, 20)
-    result = mylink.calculate()
+    result = mylink.calculate
     for i in range(-20, 0):
         try:
             ibo = mytp.ibo_at_specific_obo(i)

@@ -70,6 +70,13 @@ class Satellite(models.Model):
     service_type = models.CharField(max_length=30, choices=SERVICE_TYPE_CHOICE)
     frequency_bands = models.ManyToManyField(FrequencyBand)
 
+    def elevation_angle(self, lat, lon):
+        """
+        Returns elevation angle from given lat, lon to this satellite
+        """
+        # TODO Write this function
+        return 30
+
     def __str__(self):
         return self.name
 
@@ -83,6 +90,13 @@ class UplinkBeam(models.Model):
     peak_gt = models.FloatField("Peak G/T")
     polarization = models.CharField(max_length=10, choices=POLARIZATION_CHOICES, null=True)
     type = models.CharField(max_length=20, choices=BEAM_TYPE_CHOICES, blank=True)
+
+    def get_contour(self, lat, lon):
+        """
+        Returns relative contour from given lat, lon
+        """
+        # TODO: Write this function
+        return 0
 
     def __str__(self):
         return "{0}: {1}".format(self.satellite.name, self.name)
@@ -112,6 +126,13 @@ class DownlinkBeam(models.Model):
     satellite = models.ForeignKey(Satellite, null=True)
     name = models.CharField(max_length=20)
     peak_sat_eirp = models.FloatField("Peak saturated EIRP")
+
+    def get_contour(self, lat, lon):
+        """
+        Returns relative contour from given lat, lon
+        """
+        # TODO: Write this function
+        return 0
 
     def __str__(self):
         return "{0}: {1}".format(self.satellite.name, self.name)
@@ -271,6 +292,12 @@ class Channel(models.Model):
     )
     type = models.CharField(max_length=30, choices=CHANNEL_TYPE_CHOICES)
 
+    def is_forward(self):
+        """
+        Return true if the channel is a link from Hub to remote site
+        """
+        return type in ('Forward', 'Broadcast')
+
     def __str__(self):
         return "{0} | {1} | {2}".format(self.uplink_beam.satellite, self.uplink_beam.name, self.transponder.name)
 
@@ -426,6 +453,32 @@ class Gateway(models.Model):
     location = models.ForeignKey(Location, null=True)
     diversity_gateway = models.ForeignKey('self', help_text="Select the diversity gateway if any", blank=True,
                                           null=True)
+
+    def get_hpa_for_channel(self, channel):
+        """
+        Returns hpa for the given channel
+        """
+        return self.hpa_set.filter(channels=channel).first()
+
+    def uplink_eirp_for_channel(self, channel, frequency):
+        """
+        Returns uplink eirp for the given channel
+        """
+        hpa = self.get_hpa_for_channel(channel)
+        if hpa:
+            return Hpa(hpa).power_at_antenna_feed() + self.antenna.gain(frequency)
+        raise LinkCalcError("Cannot find uplink EIRP of channel {0} of gateway {1}".format(channel.name, self.namee))
+
+    def convert_to_station(self, channel):
+        """
+        Returns a station object used to uplink into given channel from the gateway object
+        """
+        station = Station()
+        station.antenna = self.antenna
+        station.hpa = self.get_hpa_for_channel(channel)
+        station.location = self.location
+        station.name = self.name
+        return station
 
     def __str__(self):
         return "{0}-{1} : {2}".format(self.name, self.purpose, self.location)
