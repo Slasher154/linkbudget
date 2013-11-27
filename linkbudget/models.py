@@ -291,6 +291,56 @@ class Channel(models.Model):
         ('Broadcast', 'Broadcast')
     )
     type = models.CharField(max_length=30, choices=CHANNEL_TYPE_CHOICES)
+    
+    def seek_optimized_pfd_uplink(self, carrier_bandwidth, uplink_gt):
+        """
+        Seek an optimized PFD uplink of the uplink station
+        """
+        # In FGM mode, maximum allowable EIRP is equal to an amount that drives the amplifier to get required OBO
+        # Default OBO = 0 dB
+        if self.operating_mode == "FGM":
+            backoff_per_carrier = 10 * log10(self.bandwidth / carrier_bandwidth)
+            return self.sfd_channel_at_uplink_location(uplink_gt) + self.operating_ibo - backoff_per_carrier
+        # In ALC mode, maximum allowable is equal to an amount that drives the amplifier at desired deepin
+        elif self.operating_mode == "ALC":
+            return self.sfd_channel_at_uplink_location(uplink_gt) - self.transponder.dynamic_range + self.transponder.\
+                design_alc_deepin
+        else:
+            raise LinkCalcError("No valid operating mode specified for channel {0}".format(self.name))
+
+    def sfd_channel_at_uplink_location(self, uplink_gt):
+        """
+        Returns SFD per channel at uplink location
+        """
+        if self.operating_mode == "FGM":
+            return -(self.sfd_max_atten_fgm + uplink_gt)-(self.transponder.dynamic_range-self.attenuation)
+        elif self.operating_mode == "ALC":
+            return -(self.sfd_max_atten_alc + uplink_gt)
+        else:
+            raise LinkCalcError("No valid operating mode specified for channel {0}".format(self.name))
+
+    def obo_per_carrier(self, uplink_pfd, uplink_gt, carrier_bandwidth):
+        """
+        Returns output backoff per carrier from given PFD
+        """
+        if self.operating_mode == "FGM":
+            # OBO is sought from linear graph
+            ibo_per_carrier = uplink_pfd - self.sfd_channel_at_uplink_location(uplink_gt)
+            return ibo_per_carrier - self.operating_ibo + self.operating_obo
+        elif self.operating_mode == "ALC":
+            # Check if given PFD reaches deep-in or not
+            min_sfd = self.sfd_channel_at_uplink_location(uplink_gt) - self.transponder.dynamic_range
+            deepin = uplink_pfd - min_sfd  # Not reach deepin dynamic range
+            if deepin < 0:
+                return self.operating_obo - 10 * log10(self.bandwidth / carrier_bandwidth) + deepin
+            else:
+                return self.operating_obo - 10 * log10(self.bandwidth / carrier_bandwidth)
+        else:
+            raise LinkCalcError("No valid operating mode specified for channel {0}".format(self.name))
+
+
+    def eirp_downlink_at_peak_per_carrier(self, uplink_pfd, uplink_gt, carrier_bandwidth):
+        return self.downlink_beam.peak_sat_eirp - self.obo_per_carrier(uplink_pfd, uplink_gt, carrier_bandwidth)
 
     def default_gateway(self):
         """
@@ -308,8 +358,38 @@ class Channel(models.Model):
         """
         return self.type in ('Forward', 'Broadcast')
 
+    # ------------------ Properties ---------------------       
+
+    @property
+    def attenuation(self):
+        return self._attenuation
+
+    @attenuation.setter
+    def attenuation(self, value):
+        self._attenuation = value
+
     def __str__(self):
         return "{0} | {1} | {2}".format(self.uplink_beam.satellite, self.uplink_beam.name, self.transponder.name)
+
+    @property
+    def operating_mode(self):
+        return self._operating_mode
+
+    @operating_mode.setter
+    def operating_mode(self, value):
+        self._operating_mode = value
+
+    @property
+    def operating_obo(self):
+        return self._operating_obo
+
+    @operating_obo.setter
+    def operating_obo(self, value):
+        self._operating_obo = value
+
+    @property
+    def operating_ibo(self):
+        return self.transponder.ibo_at_specific_obo(self.operating_obo)
 
 
 class AntennaVendor(models.Model):

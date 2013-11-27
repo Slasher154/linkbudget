@@ -96,6 +96,7 @@ class DownlinkResult(object):
         self.antenna_diameter = 0
         self.antenna_efficiency = 0
         self.antenna_gain = 0
+        self.eirp_at_peak = 0
         self.ifl_loss = 0
         self.lnb_gain = 0
         self.lnb_temp = 0

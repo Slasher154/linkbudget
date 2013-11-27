@@ -60,5 +60,6 @@ def result(request):
         my_string.append("NoiseBW {0} dB".format(str(link_result.uplink.noise_bandwidth)))
         my_string.append("C/NUplinkClear {0} dB".format(str(link_result.clear_sky.cn_uplink)))
         my_string.append("C/NUplinkRain {0} dB".format(str(link_result.rain_both.cn_uplink)))
+        my_string.append("EIRP Downlink at peak {0} dB".format(str(link_result.downlink.eirp_at_peak)))
 
     return render(request, "linkbudget/result.html", {"mystring": my_string})

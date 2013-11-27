@@ -22,7 +22,7 @@ class Link:
     def __init__(self, channel, modem, bandwidth, uplink_station=None,
                  downlink_station=None, gateway=None, rain_model=None, power_optimization=True,
                  power_overused=0, num_carriers_in_transponder=10, force_operating_mode=None, force_contour=None,
-                 operating_obo=0):
+                 operating_obo=0, fgm_attenuation=0):
         """
         Initialize the parameters required for the link budget.
         Required parameters: channel, modem and bandwidth
@@ -30,13 +30,14 @@ class Link:
         number of carriers in the transponders
         """
         self.channel = channel
+        self.channel.attenuation = fgm_attenuation
+        self.channel.operating_obo = operating_obo
         self.modem = modem
         self.bandwidth = bandwidth
         self.uplink_station = uplink_station
         self.downlink_station = downlink_station
         self.gateway = gateway
         self.rain_model = rain_model
-        self.power_optimization = power_optimization
         self.power_optimization = power_optimization
         self.power_overused = power_overused
         self.num_carriers_in_transponder = num_carriers_in_transponder
@@ -78,9 +79,9 @@ class Link:
         # If the operating mode is not forced by user (which should be a normal case), use the transponder's primary
         # mode
         if self.force_operating_mode:
-            operating_mode = self.force_operating_mode
+            self.channel.operating_mode = self.force_operating_mode
         else:
-            operating_mode = self.channel.transponder.primary_mode
+            self.channel.operating_mode = self.channel.transponder.primary_mode
 
         # ---- C/N Uplink ----
 
@@ -106,17 +107,17 @@ class Link:
 
         # Find optimized PFD if power optimization is true
         if self.power_optimization:
-            optimized_pfd = self.seek_optimized_pfd_uplink(self.channel, self.bandwidth, uplink_gt,
-                                                           operating_mode, self.operating_obo)
+            optimized_pfd = self.channel.seek_optimized_pfd_uplink(self.bandwidth, uplink_gt)
             # TODO: Write a function for exact slant range
+            # If power overused is specified, EIRP required will increase based on that overused power
             spreading_loss = self.spreading_loss(GEOSYNCHRONOUS_ALTITUDE)
-            optimized_eirp = optimized_pfd + spreading_loss
+            optimized_eirp = optimized_pfd + spreading_loss + self.power_overused
 
             # Uplink EIRP will be limited at optimized EIRP if station has higher power
             # Else, the station is underused power
             if station_eirp > optimized_eirp:
                 uplink_eirp = optimized_eirp
-            else:  # underused power
+            else:  # underused power or overused but less than given value
                 uplink_eirp = station_eirp
 
         else:
@@ -139,7 +140,8 @@ class Link:
         uplink_noise_bandwidth = self.noise_bandwidth(self.bandwidth)
 
         # Calculates atmospheric attenuation
-        uplink_atten = Attenuation(uplink_frequency, self.channel.uplink_beam.satellite.elevation_angle(uplink_lat, uplink_lon),
+        uplink_atten = Attenuation(uplink_frequency, self.channel.uplink_beam.satellite.elevation_angle(uplink_lat,
+                                                                                                        uplink_lon),
                                    uplink_station.antenna.diameter, uplink_availability, uplink_lat, uplink_lon)
 
         # Compute C/N Uplink (clear sky and rain fade)
@@ -148,7 +150,22 @@ class Link:
         cn_clear = cn_without_atten - uplink_atten.total_clear_sky()
         cn_rain = cn_without_atten - uplink_atten.total_rain()
 
-        # Record uplink station parameters
+        # ---- C/N Downlink ----
+
+        # Compute EIRP downlink of the channel from uplink power flux density and satellite settings
+        downlink_eirp_at_peak = self.channel.eirp_downlink_at_peak_per_carrier(uplink_pfd, uplink_gt, self.bandwidth)
+
+
+        # For return channel, check whether the downlink station is specified.
+        # If not, use the default gateway of the channel
+        # If downlink station is specified, check the following for usage compatibility:
+        # 1. Antenna's receive frequency range and polarization matches the beam
+        # 2. Downlink location is in the beam coverage
+        # Return error if requirements are not met
+
+        # Compute C/N Downlink (clear sky, up fade only, down fade only and both fade from default availability)
+
+        # Record uplink budget parameters
         uplink.latitude = uplink_station.location.latitude
         uplink.longitude = uplink_station.location.longitude
         uplink.polarization = self.channel.uplink_beam.polarization
@@ -168,7 +185,8 @@ class Link:
         uplink.spreading_loss = self.spreading_loss(GEOSYNCHRONOUS_ALTITUDE)
         uplink.relative_contour = uplink_contour
         uplink.gt = uplink_gt
-        uplink.optimized_eirp = optimized_eirp
+        if self.power_optimization:
+            uplink.optimized_eirp = optimized_eirp
         uplink.eirp = uplink_eirp
         uplink.pfd = uplink_pfd
         uplink.availability = 0
@@ -182,24 +200,15 @@ class Link:
         uplink.rain_attenuation = uplink_atten.rain()
         uplink.noise_bandwidth = uplink_noise_bandwidth
 
+        downlink.eirp_at_peak = downlink_eirp_at_peak
+
         # Record to C/N results
         clear_sky.cn_uplink = cn_clear
         rain_down.cn_uplink = cn_clear
         rain_up.cn_uplink = cn_rain
         rain_both.cn_uplink = cn_rain
 
-        # ---- C/N Downlink ----
 
-        # Compute EIRP downlink of the channel from uplink power flux density and satellite settings
-
-        # For return channel, check whether the downlink station is specified.
-        # If not, use the default gateway of the channel
-        # If downlink station is specified, check the following for usage compatibility:
-        # 1. Antenna's receive frequency range and polarization matches the beam
-        # 2. Downlink location is in the beam coverage
-        # Return error if requirements are not met
-
-        # Compute C/N Downlink (clear sky, up fade only, down fade only and both fade from default availability)
 
         # ---- C/I ----
 
@@ -252,25 +261,6 @@ class Link:
             raise LinkCalcError("Input bandwidth ({0} MHz) cannot be less than zero.".format(str(self.bandwidth)))
         if self.force_operating_mode:
             self.channel.transponder.validate_transponder_mode(self.force_operating_mode)
-
-    def seek_optimized_pfd_uplink(self, channel, carrier_bandwidth, gt_at_location, operating_mode,
-                                  operating_obo=0, atten=0):
-        """
-        Seek an optimized PFD uplink of the uplink station
-        """
-
-        # In FGM mode, maximum allowable EIRP is equal to an amount that drives the amplifier to get required OBO
-        # Default OBO = 0 dB
-        if operating_mode == "FGM":
-            operating_ibo = channel.transponder.ibo_at_specific_obo(operating_obo)
-            backoff_per_carrier = 10 * log10(channel.bandwidth / carrier_bandwidth)
-            sfd_channel_at_location = -(  # SFD in form of -(X+G/T)-(16-Atten)
-                channel.sfd_max_atten_fgm + gt_at_location)-(channel.transponder.dynamic_range-atten)
-            return sfd_channel_at_location + operating_ibo - backoff_per_carrier
-        # In ALC mode, maximum allowable is equal to an amount that drives the amplifier at desired deepin
-        else:
-            sfd_channel_at_location = -(channel.sfd_max_atten_alc + gt_at_location)
-            return sfd_channel_at_location - channel.transponder.dynamic_range + channel.transponder.design_alc_deepin
 
     def spreading_loss(self, slant_range):
         """
