@@ -9,10 +9,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a3d577e8-b42b-4a75-96cb-499c18eca308" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/linkbudget/linkcalc.py" afterPath="$PROJECT_DIR$/linkbudget/linkcalc.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/linkbudget/models.py" afterPath="$PROJECT_DIR$/linkbudget/models.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/linkbudget/result.py" afterPath="$PROJECT_DIR$/linkbudget/result.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/linkbudget/views.py" afterPath="$PROJECT_DIR$/linkbudget/views.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="mysite.iws" />
@@ -53,7 +49,7 @@
           <file leaf-file-name="views.py" pinned="false" current="true" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/linkbudget/views.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="62" column="100" selection-start="3850" selection-end="3850" vertical-scroll-proportion="0.83765346" vertical-offset="355" max-vertical-offset="1105">
+                <state line="62" column="100" selection-start="3850" selection-end="3850" vertical-scroll-proportion="1.8112094" vertical-offset="355" max-vertical-offset="1105">
                   <folding />
                 </state>
               </provider>
@@ -136,7 +132,7 @@
           <file leaf-file-name="result.py" pinned="false" current="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/linkbudget/result.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="98" column="29" selection-start="3204" selection-end="3204" vertical-scroll-proportion="0.31903484" vertical-offset="1428" max-vertical-offset="2992">
+                <state line="98" column="29" selection-start="3204" selection-end="3204" vertical-scroll-proportion="0.6761364" vertical-offset="1428" max-vertical-offset="2992">
                   <folding />
                 </state>
               </provider>
@@ -222,7 +218,7 @@
     <option name="STATE" value="0" />
   </component>
   <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+    <navigator proportions="" version="1" splitterProportion="0.5">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -233,43 +229,7 @@
       <autoscrollFromSource />
       <sortByType />
     </navigator>
-    <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mysite" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mysite" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mysite" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mysite" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mysite" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="linkbudget" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
-      <pane id="Scope" />
-    </panes>
+    <panes />
   </component>
   <component name="PropertiesComponent">
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="60" />
@@ -741,7 +701,11 @@
       <created>1385470627811</created>
       <updated>1385470627811</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Finish EIRP downlink at peak function.">
+      <created>1385528131848</created>
+      <updated>1385528131848</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -768,6 +732,7 @@
     <frame x="-4" y="-4" width="1608" height="868" extended-state="6" />
     <editor active="true" />
     <layout>
+      <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.5274431" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32596686" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32797858" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -777,17 +742,16 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25033468" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.1575" sideWeight="0.50066936" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32825485" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23427041" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17696267" sideWeight="0.7656033" order="5" side_tool="false" content_ui="tabs" x="662" y="188" width="275" height="483" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.1575" sideWeight="0.74698794" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25301206" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2815534" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32947233" sideWeight="0.7656033" order="6" side_tool="false" content_ui="tabs" x="653" y="141" width="450" height="529" />
-      <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5274431" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3994452" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -847,7 +811,8 @@
     <MESSAGE value="Add seek optimized power function." />
     <MESSAGE value="Almost complete uplink part" />
     <MESSAGE value="Complete most part of uplink result." />
-    <option name="LAST_COMMIT_MESSAGE" value="Complete most part of uplink result." />
+    <MESSAGE value="Finish EIRP downlink at peak function." />
+    <option name="LAST_COMMIT_MESSAGE" value="Finish EIRP downlink at peak function." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -941,7 +906,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/linkbudget/result.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="98" column="29" selection-start="3204" selection-end="3204" vertical-scroll-proportion="0.31903484" vertical-offset="1428" max-vertical-offset="2992">
+        <state line="98" column="29" selection-start="3204" selection-end="3204" vertical-scroll-proportion="0.6761364" vertical-offset="1428" max-vertical-offset="2992">
           <folding />
         </state>
       </provider>
@@ -958,7 +923,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/linkbudget/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="62" column="100" selection-start="3850" selection-end="3850" vertical-scroll-proportion="0.83765346" vertical-offset="355" max-vertical-offset="1105">
+        <state line="62" column="100" selection-start="3850" selection-end="3850" vertical-scroll-proportion="1.8112094" vertical-offset="355" max-vertical-offset="1105">
           <folding />
         </state>
       </provider>
