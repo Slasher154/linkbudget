@@ -352,12 +352,6 @@ class Channel(models.Model):
         else:
             return None
 
-    def is_forward(self):
-        """
-        Return true if the channel is a link from Hub to remote site
-        """
-        return self.type in ('Forward', 'Broadcast')
-
     # ------------------ Properties ---------------------       
 
     @property
@@ -389,8 +383,24 @@ class Channel(models.Model):
 
     @property
     def operating_ibo(self):
-        return self.transponder.ibo_at_specific_obo(self.operating_obo)
+        if self.operating_mode == "FGM":
+            return self.transponder.ibo_at_specific_obo(self.operating_obo)
+        elif self.operating_obo == "ALC":
+            return "N/A"
+        else:
+            raise LinkCalcError("No valid operating mode specified for channel {0}".format(self.name))
 
+
+    @property
+    def is_forward(self):
+        return self.type in ('Forward', 'Broadcast')
+
+    @property
+    def is_return(self):
+        """
+        Return true if the chanel is a link from remote site to hub
+        """
+        return self.type == 'Return'
 
 class AntennaVendor(models.Model):
     """
@@ -441,12 +451,23 @@ class Antenna(models.Model):
         else:
             raise LinkCalcError("Invalid frequency range.")
 
-
+    def gt(self, frequency, elevation_angle, noise_temp=100):
+        """
+        Returns antenna G/T at given frequency(GHz) and elevation angle
+        """
+        # G/T in the database is used by default if stored
+        # TODO: Modify to seek from frequency also
+        gt = self.antennagt_set.filter(elevation_angle__gt=elevation_angle).order_by('elevation_angle').first()
+        if gt:
+            return gt
+        # If no G/T in the database, use antenna gain and noise temp
+        else:
+            # TODO: Add accurate functions to noise temp
+            # Default noise temp is 100 K
+            return self.gain(frequency) - 10 * log10(noise_temp)
 
     def __str__(self):
         return "{0} {1}".format(self.vendor, self.name)
-
-
 
 
 class AntennaGain(models.Model):
@@ -594,7 +615,7 @@ class Hpa(models.Model):
     upc = models.FloatField("UPC", help_text="Default UPC for this amplifier. Positive value")
     ifl = models.FloatField("IFL", help_text="Loss between amplifier output and antenna feed. Negative Value.")
     channels = models.ManyToManyField(Channel, help_text="Satellite channel associated with this HPA (for HPA in"
-                                                         "gateway only)")
+                                                         "gateway only)", null=True, blank=True)
     gateway = models.ForeignKey(Gateway, help_text="Leave it blank if this HPA is not in the gateway", null=True,
                                 blank=True)
 

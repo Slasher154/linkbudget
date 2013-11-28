@@ -78,6 +78,7 @@ class SatelliteResult(object):
         self.channel_sfd = 0
         self.channel_input_backoff = 0
         self.channel_output_backoff = 0
+        self.carrier_input_backoff = 0
         self.carrier_output_backoff = 0
         self.channel_operating_mode = ""
         self.peak_saturated_eirp = 0
@@ -96,7 +97,10 @@ class DownlinkResult(object):
         self.antenna_diameter = 0
         self.antenna_efficiency = 0
         self.antenna_gain = 0
+        self.antenna_gt_clear = 0
+        self.antenna_gt_rain = 0
         self.eirp_at_peak = 0
+        self.eirp_at_location = 0
         self.ifl_loss = 0
         self.lnb_gain = 0
         self.lnb_temp = 0

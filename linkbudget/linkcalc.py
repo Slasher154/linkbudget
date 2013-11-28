@@ -75,6 +75,8 @@ class Link:
         uplink_gt = self.channel.uplink_beam.peak_gt  # Beam peak
         uplink_frequency = self.channel.uplink_center_frequency
         uplink_availability = 0.995
+        downlink_frequency = self.channel.downlink_center_frequency
+        downlink_availability = 0.995
 
         # If the operating mode is not forced by user (which should be a normal case), use the transponder's primary
         # mode
@@ -95,7 +97,7 @@ class Link:
             uplink_station = self.uplink_station
 
         # Use default gateway if gateway is true
-        elif self.gateway and self.channel.is_forward():
+        elif self.gateway and self.channel.is_forward:
             uplink_gateway = self.channel.default_gateway()
             uplink_station = uplink_gateway.convert_to_station(self.channel)
             if not uplink_station:
@@ -145,16 +147,15 @@ class Link:
                                    uplink_station.antenna.diameter, uplink_availability, uplink_lat, uplink_lon)
 
         # Compute C/N Uplink (clear sky and rain fade)
-        cn_without_atten = uplink_eirp + uplink_gt + uplink_contour - uplink_path_loss - uplink_noise_bandwidth \
+        cn_uplink_without_atten = uplink_eirp + uplink_gt + uplink_contour - uplink_path_loss - uplink_noise_bandwidth \
             - BOLTZMANN_CONSTANT
-        cn_clear = cn_without_atten - uplink_atten.total_clear_sky()
-        cn_rain = cn_without_atten - uplink_atten.total_rain()
+        cn_uplink_clear = cn_uplink_without_atten - uplink_atten.total_clear_sky()
+        cn_uplink_rain = cn_uplink_without_atten - uplink_atten.total_rain()
 
         # ---- C/N Downlink ----
 
         # Compute EIRP downlink of the channel from uplink power flux density and satellite settings
         downlink_eirp_at_peak = self.channel.eirp_downlink_at_peak_per_carrier(uplink_pfd, uplink_gt, self.bandwidth)
-
 
         # For return channel, check whether the downlink station is specified.
         # If not, use the default gateway of the channel
@@ -164,6 +165,52 @@ class Link:
         # Return error if requirements are not met
 
         # Compute C/N Downlink (clear sky, up fade only, down fade only and both fade from default availability)
+
+        # Check if downlink station is given
+        if isinstance(self.downlink_station, Station):
+            downlink_station = self.downlink_station
+
+        # Use default gateway if gateway is true
+        elif self.gateway and self.channel.is_return:
+            downlink_gateway = self.channel.default_gateway()
+            downlink_station = downlink_gateway.convert_to_station(self.channel)
+            if not downlink_station:
+                raise LinkCalcError("There is no default gateway for channel {0}".format(self.channel.name))
+        else:
+            raise LinkCalcError("No downlink station provided.")
+
+        # Declare local variables for uplink station lat/lon
+        downlink_lat = downlink_station.location.latitude
+        downlink_lon = downlink_station.location.longitude
+
+        # Finds downlink relative contour of the station
+        downlink_contour = self.channel.downlink_beam.get_contour(downlink_lat, downlink_lon)
+
+        # Finds noise temp at rain
+        # TODO: Modify this
+        noise_temp_at_rain = 220
+
+        # Calculates downlink G/T at clear sky and rain fade
+        downlink_gt_clear_sky = downlink_station.antenna.gt(downlink_frequency, self.channel.uplink_beam.satellite.elevation_angle(downlink_lat, downlink_lon))
+        downlink_gt_rain = downlink_station.antenna.gt(downlink_frequency, self.channel.uplink_beam.satellite.elevation_angle(downlink_lat, downlink_lon), noise_temp=noise_temp_at_rain)
+
+        # Calculates path losses
+        downlink_path_loss = self.path_loss(GEOSYNCHRONOUS_ALTITUDE, downlink_frequency)
+
+        # Calculates noise bandwidth
+        downlink_noise_bandwidth = self.noise_bandwidth(self.bandwidth)
+
+        # Calculates atmospheric attenuation
+        downlink_atten = Attenuation(downlink_frequency, self.channel.downlink_beam.satellite.elevation_angle
+            (downlink_lat, downlink_lon), downlink_station.antenna.diameter, downlink_availability, downlink_lat, downlink_lon)
+
+        # Compute C/N downlink (clear sky and rain fade)
+        cn_downlink_without_atten_clear = downlink_eirp_at_peak + downlink_gt_clear_sky + downlink_contour - downlink_path_loss - downlink_noise_bandwidth \
+            - BOLTZMANN_CONSTANT
+        cn_downlink_without_atten_rain = downlink_eirp_at_peak + downlink_gt_rain + downlink_contour - downlink_path_loss - downlink_noise_bandwidth \
+            - BOLTZMANN_CONSTANT
+        cn_downlink_clear = cn_downlink_without_atten_clear - downlink_atten.total_clear_sky()
+        cn_downlink_rain = cn_downlink_without_atten_rain - downlink_atten.total_rain()
 
         # Record uplink budget parameters
         uplink.latitude = uplink_station.location.latitude
@@ -200,13 +247,59 @@ class Link:
         uplink.rain_attenuation = uplink_atten.rain()
         uplink.noise_bandwidth = uplink_noise_bandwidth
 
-        downlink.eirp_at_peak = downlink_eirp_at_peak
+        # Record satellite parameters
+        sat = self.channel.uplink_beam.satellite
+        satellite.name = sat.name
+        satellite.orbital_slot = sat.orbital_slot
+        satellite.half_station_keeping_box = sat.half_station_keeping_box
+        satellite.channel_bandwidth = self.channel.bandwidth
+        satellite.peak_gt = self.channel.uplink_beam.peak_gt
+        satellite.channel_sfd = self.channel.sfd_channel_at_uplink_location(uplink_gt)
+        satellite.channel_input_backoff = self.channel.operating_ibo
+        satellite.channel_output_backoff = self.channel.operating_obo
+        satellite.channel_operating_mode = self.channel.operating_mode
+        satellite.peak_saturated_eirp = self.channel.downlink_beam.peak_sat_eirp
+        satellite.gain_variation = 0
+
+        # Record downlink budget parameters
+        downlink.latitude = downlink_station.location.latitude
+        downlink.longitude = downlink_station.location.longitude
+        downlink.polarization = self.channel.downlink_beam.polarization
+        downlink.slant_range = GEOSYNCHRONOUS_ALTITUDE
+        downlink.frequency = downlink_frequency
+        downlink.elevation = self.channel.downlink_beam.satellite.elevation_angle(downlink_station.location.latitude,
+                                                                              downlink_station.location.longitude)
+        downlink.antenna_diameter = downlink_station.antenna.diameter
+        downlink.antenna_efficiency = downlink_station.antenna.efficiency(downlink_frequency)
+        downlink.antenna_gain = downlink_station.antenna.gain(downlink.frequency)
+        downlink.antenna_gt_clear = downlink_gt_clear_sky
+        downlink.antenna_gt_rain = downlink_gt_rain
+        downlink.relative_contour = downlink_contour
+        downlink.eirp_at_location = downlink_eirp_at_peak + downlink_contour
+        downlink.availability = downlink_availability
+        downlink.pointing_loss = self.pointing_loss()
+        downlink.xpol_loss = self.xpol_loss()
+        downlink.axial_ratio_loss = self.axial_ratio_loss()
+        downlink.path_loss = downlink_path_loss
+        downlink.cloud_attenuation = downlink_atten.cloud()
+        downlink.gas_attenuation = downlink_atten.gas()
+        downlink.scin_attenuation = downlink_atten.scin()
+        downlink.rain_attenuation = downlink_atten.rain()
+        downlink.noise_bandwidth = downlink_noise_bandwidth
 
         # Record to C/N results
-        clear_sky.cn_uplink = cn_clear
-        rain_down.cn_uplink = cn_clear
-        rain_up.cn_uplink = cn_rain
-        rain_both.cn_uplink = cn_rain
+        clear_sky.cn_uplink = cn_uplink_clear
+        clear_sky.cn_downlink = cn_downlink_clear
+        clear_sky.cn_total = self.carrier_over_noise_total(cn_uplink_clear, cn_downlink_clear)
+        rain_down.cn_downlink = cn_downlink_rain
+        rain_down.cn_uplink = cn_uplink_clear
+        rain_down.cn_total = self.carrier_over_noise_total(cn_uplink_clear, cn_downlink_rain)
+        rain_up.cn_uplink = cn_uplink_rain
+        rain_up.cn_downlink = cn_downlink_clear
+        rain_up.cn_total = self.carrier_over_noise_total(cn_uplink_rain, cn_downlink_clear)
+        rain_both.cn_uplink = cn_uplink_rain
+        rain_both.cn_downlink = cn_downlink_rain
+        rain_both.cn_total = self.carrier_over_noise_total(cn_uplink_rain, cn_downlink_rain)
 
 
 
@@ -299,8 +392,22 @@ class Link:
     def carrier_over_noise(self):
         pass
 
+    def carrier_over_noise_total(self, cn_uplink, cn_downlink, ci_uplink=50, ci_downlink=50):
+        """
+        Returns C/N total from C/N uplink, C/N downlink, C/I uplink and C/N downlink
+        """
+        return self.cn_operation(cn_uplink, cn_downlink, ci_uplink, ci_downlink)
+
+
+
     @staticmethod
     def wavelength(frequency):
         return SPEED_OF_LIGHT / (frequency * 10 ** 9)
 
 
+    @staticmethod
+    def cn_operation(*args):
+        result = 0
+        for cn in args:
+            result += 1 / (10 ** (cn / 10))
+        return -10 * log10(result)
