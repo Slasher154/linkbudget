@@ -258,6 +258,7 @@ class Link:
         satellite.channel_input_backoff = self.channel.operating_ibo
         satellite.channel_output_backoff = self.channel.operating_obo
         satellite.channel_operating_mode = self.channel.operating_mode
+        satellite.carrier_output_backoff = self.channel.obo_per_carrier(uplink_pfd, uplink_gt, self.bandwidth)
         satellite.peak_saturated_eirp = self.channel.downlink_beam.peak_sat_eirp
         satellite.gain_variation = 0
 

@@ -126,6 +126,9 @@ class DownlinkBeam(models.Model):
     satellite = models.ForeignKey(Satellite, null=True)
     name = models.CharField(max_length=20)
     peak_sat_eirp = models.FloatField("Peak saturated EIRP")
+    polarization = models.CharField(max_length=10, choices=POLARIZATION_CHOICES, null=True)
+    type = models.CharField(max_length=20, choices=BEAM_TYPE_CHOICES, blank=True)
+
 
     def get_contour(self, lat, lon):
         """
@@ -340,7 +343,7 @@ class Channel(models.Model):
 
 
     def eirp_downlink_at_peak_per_carrier(self, uplink_pfd, uplink_gt, carrier_bandwidth):
-        return self.downlink_beam.peak_sat_eirp - self.obo_per_carrier(uplink_pfd, uplink_gt, carrier_bandwidth)
+        return self.downlink_beam.peak_sat_eirp + self.obo_per_carrier(uplink_pfd, uplink_gt, carrier_bandwidth)
 
     def default_gateway(self):
         """
@@ -385,7 +388,7 @@ class Channel(models.Model):
     def operating_ibo(self):
         if self.operating_mode == "FGM":
             return self.transponder.ibo_at_specific_obo(self.operating_obo)
-        elif self.operating_obo == "ALC":
+        elif self.operating_mode == "ALC":
             return "N/A"
         else:
             raise LinkCalcError("No valid operating mode specified for channel {0}".format(self.name))
@@ -441,11 +444,16 @@ class Antenna(models.Model):
         band = FrequencyBand.get_frequency_band(frequency)
         if band:
             # Seek if there is antenna gain data at this band (from the spec sheet)
-            gain_at_frequency = self.antennagain_set.filter(frequency__gt=band.start, frequency__lt=band.stop).first()
+            gain_at_frequency = self.antennagain_set.filter(frequency__gt=band.start, frequency__lt=band.stop)
 
-            # If the gain data exists, calculate efficiency from that gain
+            # If the gain data exists, loop all the gain values to find closest frequency
+            # This step is to differentiate between Tx and Rx frequency
             if gain_at_frequency:
-                return 10 ** (gain_at_frequency.value/10) * (SPEED_OF_LIGHT / (pi * frequency * 10 ** 9 * self.diameter)) ** 2
+                gain_difference = 100
+                for g in gain_at_frequency:
+                    if abs(g.frequency - frequency) < gain_difference:
+                        gain = g
+                return 10 ** (gain.value/10) * (SPEED_OF_LIGHT / (pi * gain.frequency * 10 ** 9 * self.diameter)) ** 2
             else:
                 return 0.6
         else:
