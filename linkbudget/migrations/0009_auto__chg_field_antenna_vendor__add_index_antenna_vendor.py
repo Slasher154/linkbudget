@@ -12,7 +12,7 @@ class Migration(SchemaMigration):
         # Renaming column for 'Antenna.vendor' to match new field type.
         db.rename_column(u'linkbudget_antenna', 'vendor', 'vendor_id')
         # Changing field 'Antenna.vendor'
-        db.alter_column(u'linkbudget_antenna', 'vendor_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['linkbudget.AntennaVendor'], null=True))
+        # db.alter_column(u'linkbudget_antenna', 'vendor_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['linkbudget.AntennaVendor'], null=True))
         # Adding index on 'Antenna', fields ['vendor']
         db.create_index(u'linkbudget_antenna', ['vendor_id'])
 

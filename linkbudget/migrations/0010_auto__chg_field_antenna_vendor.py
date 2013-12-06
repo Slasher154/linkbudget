@@ -10,12 +10,14 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # Changing field 'Antenna.vendor'
-        db.alter_column(u'linkbudget_antenna', 'vendor_id', self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['linkbudget.AntennaVendor']))
+        # db.alter_column(u'linkbudget_antenna', 'vendor_id', self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['linkbudget.AntennaVendor']))
+        pass
 
     def backwards(self, orm):
 
         # Changing field 'Antenna.vendor'
-        db.alter_column(u'linkbudget_antenna', 'vendor_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['linkbudget.AntennaVendor'], null=True))
+        # db.alter_column(u'linkbudget_antenna', 'vendor_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['linkbudget.AntennaVendor'], null=True))
+        pass
 
     models = {
         u'linkbudget.alcfullloadbackoff': {

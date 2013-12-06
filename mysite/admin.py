@@ -56,6 +56,11 @@ class AvailableSymbolRateInline(admin.TabularInline):
 class MCGInline(admin.TabularInline):
     model = MCG
 
+
+class ModemOperationModeInline(admin.TabularInline):
+    model = ModemOperationMode
+    extra = 1
+
 # ------------------- Admin Class --------------------------------------
 
 class FrequencyBandAdmin(admin.ModelAdmin):
@@ -124,7 +129,9 @@ class ModemVendorAdmin(admin.ModelAdmin):
 
 
 class ModemAdmin(admin.ModelAdmin):
-    pass
+    inlines = [
+        ModemOperationModeInline
+    ]
 
 
 class ModemApplicationAdmin(admin.ModelAdmin):
@@ -132,6 +139,8 @@ class ModemApplicationAdmin(admin.ModelAdmin):
         AvailableSymbolRateInline,
         MCGInline,
     ]
+
+
 
 # Register project progress model
 admin.site.register(Progress, ProgressAdmin)

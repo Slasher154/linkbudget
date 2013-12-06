@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block content %}
-    {% if uplink %}
+    <div class="container">
         <div class="col-lg-4">
             <div class="panel panel-primary">
                 <div class="panel-heading"><i class="glyphicon glyphicon-tasks"></i> Uplink</div>
@@ -12,8 +12,6 @@
                 </div>
             </div>
         </div>
-    {% endif %}
-    {% if satellite %}
         <div class="col-lg-4">
             <div class="panel panel-primary">
                 <div class="panel-heading"><i class="glyphicon glyphicon-tasks"></i> Satellite</div>
@@ -24,8 +22,6 @@
                 </div>
             </div>
         </div>
-    {% endif %}
-    {% if downlink %}
         <div class="col-lg-4">
             <div class="panel panel-primary">
                 <div class="panel-heading"><i class="glyphicon glyphicon-tasks"></i> Downlink</div>
@@ -36,7 +32,49 @@
                 </div>
             </div>
         </div>
-    {% endif %}
+    </div>
+    <div class="container">
+        <div class="col-lg-3">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><i class="glyphicon glyphicon-tasks"></i> Clear Sky</div>
+                <div class="panel-body">
+                    {% for s in clear_sky %}
+                        {{ s }} <br>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><i class="glyphicon glyphicon-tasks"></i> Rain Up</div>
+                <div class="panel-body">
+                    {% for s in rain_up %}
+                        {{ s }} <br>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><i class="glyphicon glyphicon-tasks"></i> Rain Down</div>
+                <div class="panel-body">
+                    {% for s in rain_down %}
+                        {{ s }} <br>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><i class="glyphicon glyphicon-tasks"></i> Both Fade</div>
+                <div class="panel-body">
+                    {% for s in rain_both %}
+                        {{ s }} <br>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
     {% if messages %}
         <div class="panel panel-danger">
             <div class="panel-heading"><i class="glyphicon glyphicon-tasks"></i> Error Messages</div>

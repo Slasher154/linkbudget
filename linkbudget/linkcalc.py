@@ -19,7 +19,7 @@ class LinkCalcError(Exception):
 
 
 class Link:
-    def __init__(self, channel, modem, bandwidth, uplink_station=None,
+    def __init__(self, channel, modem_operation_mode, bandwidth, uplink_station=None,
                  downlink_station=None, gateway=None, rain_model=None, power_optimization=True,
                  power_overused=0, num_carriers_in_transponder=10, force_operating_mode=None, force_contour=None,
                  operating_obo=0, fgm_attenuation=0):
@@ -32,7 +32,7 @@ class Link:
         self.channel = channel
         self.channel.attenuation = fgm_attenuation
         self.channel.operating_obo = operating_obo
-        self.modem = modem
+        self.modem_operation_mode = modem_operation_mode
         self.bandwidth = bandwidth
         self.uplink_station = uplink_station
         self.downlink_station = downlink_station
@@ -74,9 +74,9 @@ class Link:
         # so no power optimization required.
         uplink_gt = self.channel.uplink_beam.peak_gt  # Beam peak
         uplink_frequency = self.channel.uplink_center_frequency
-        uplink_availability = 0.995
+        uplink_availability = 99.5
         downlink_frequency = self.channel.downlink_center_frequency
-        downlink_availability = 0.995
+        downlink_availability = 99.5
 
         # If the operating mode is not forced by user (which should be a normal case), use the transponder's primary
         # mode
@@ -144,13 +144,14 @@ class Link:
         # Calculates atmospheric attenuation
         uplink_atten = Attenuation(uplink_frequency, self.channel.uplink_beam.satellite.elevation_angle(uplink_lat,
                                                                                                         uplink_lon),
-                                   uplink_station.antenna.diameter, uplink_availability, uplink_lat, uplink_lon)
+                                   uplink_station.antenna.diameter, self.channel.uplink_beam.polarization,
+                                   uplink_availability, uplink_lat, uplink_lon)
 
         # Compute C/N Uplink (clear sky and rain fade)
         cn_uplink_without_atten = uplink_eirp + uplink_gt + uplink_contour - uplink_path_loss - uplink_noise_bandwidth \
             - BOLTZMANN_CONSTANT
-        cn_uplink_clear = cn_uplink_without_atten - uplink_atten.total_clear_sky()
-        cn_uplink_rain = cn_uplink_without_atten - uplink_atten.total_rain()
+        cn_uplink_clear = cn_uplink_without_atten - uplink_atten.total_clear_sky
+        cn_uplink_rain = cn_uplink_without_atten - uplink_atten.total_rain
 
         # ---- C/N Downlink ----
 
@@ -202,15 +203,81 @@ class Link:
 
         # Calculates atmospheric attenuation
         downlink_atten = Attenuation(downlink_frequency, self.channel.downlink_beam.satellite.elevation_angle
-            (downlink_lat, downlink_lon), downlink_station.antenna.diameter, downlink_availability, downlink_lat, downlink_lon)
+            (downlink_lat, downlink_lon), downlink_station.antenna.diameter, self.channel.downlink_beam.polarization, downlink_availability, downlink_lat, downlink_lon)
 
         # Compute C/N downlink (clear sky and rain fade)
         cn_downlink_without_atten_clear = downlink_eirp_at_peak + downlink_gt_clear_sky + downlink_contour - downlink_path_loss - downlink_noise_bandwidth \
             - BOLTZMANN_CONSTANT
         cn_downlink_without_atten_rain = downlink_eirp_at_peak + downlink_gt_rain + downlink_contour - downlink_path_loss - downlink_noise_bandwidth \
             - BOLTZMANN_CONSTANT
-        cn_downlink_clear = cn_downlink_without_atten_clear - downlink_atten.total_clear_sky()
-        cn_downlink_rain = cn_downlink_without_atten_rain - downlink_atten.total_rain()
+        cn_downlink_clear = cn_downlink_without_atten_clear - downlink_atten.total_clear_sky
+        cn_downlink_rain = cn_downlink_without_atten_rain - downlink_atten.total_rain
+
+         # ---- C/I ----
+        # TODO: Write these function
+
+        # Compute the value of C/I from power source if it has default value of C/I3IM or NPR in the database.
+        ci_uplink_amplifier = 50
+
+        # Compute C/I from satellite if it has default value of transponder's C/I3M or NPR
+        ci_transponder_amplifier = 50
+
+        # Compute C/I uplink from adjacent satellites
+        ci_uplink_adjacent_satellite = 50
+
+        # Compute C/I downlink from adjacent satellites
+        ci_downlink_adjacent_satellite = 50
+
+        # Compute C/I uplink from adjacent cells
+        ci_uplink_adjacent_cells = 50
+
+        # Compute C/I downlink from adjacent cells
+        ci_downlink_adjacent_cells = 50
+
+        # Compute total C/I uplink
+        ci_uplink_total = self.carrier_over_noise_total(ci_uplink_amplifier, ci_uplink_adjacent_satellite, ci_uplink_adjacent_cells)
+        ci_downlink_total = self.carrier_over_noise_total(ci_transponder_amplifier, ci_downlink_adjacent_satellite, ci_downlink_adjacent_cells)
+
+        # ---- C/N Total ----
+
+        cn_total_clear_sky = self.carrier_over_noise_total(cn_uplink_clear, cn_downlink_clear, ci_uplink_total, ci_downlink_total)
+        cn_total_rain_down = self.carrier_over_noise_total(cn_uplink_clear, cn_downlink_rain, ci_uplink_total, ci_downlink_total)
+        cn_total_rain_up = self.carrier_over_noise_total(cn_uplink_rain, cn_downlink_clear, ci_uplink_total, ci_downlink_total)
+        cn_total_rain_both = self.carrier_over_noise_total(cn_uplink_rain, cn_downlink_rain, ci_uplink_total, ci_downlink_total)
+
+        # ---- Capacity ----
+        # Compute link capacity (clear sky, up fade only, down fade only and both fade )
+        # in both MHz and Mbps
+
+        # Find modem application based on modem operation mode and type of channel (FWD/RTN)
+        if self.channel.is_forward:
+            application = self.modem_operation_mode.forward_application
+        elif self.channel.is_return:
+            application = self.modem_operation_mode.return_application
+        else:
+            raise LinkCalcError("Cannot identify channel type")
+
+        # Find best modulation for all cases
+        modulation_clear_sky = application.get_best_mcg(cn_total_clear_sky)
+        modulation_rain_down = application.get_best_mcg(cn_total_rain_down)
+        modulation_rain_up = application.get_best_mcg(cn_total_rain_up)
+        modulation_rain_both = application.get_best_mcg(cn_total_rain_both, link_margin=0.01)
+
+        # Find capacity for all cases
+        capacity_clear_sky = (self.bandwidth / application.rolloff_factor_for_calculation) * modulation_clear_sky.efficiency_for_calculation
+        capacity_rain_down = (self.bandwidth / application.rolloff_factor_for_calculation) * modulation_rain_down.efficiency_for_calculation
+        capacity_rain_up = (self.bandwidth / application.rolloff_factor_for_calculation) * modulation_rain_up.efficiency_for_calculation
+        capacity_rain_both = (self.bandwidth / application.rolloff_factor_for_calculation) * modulation_rain_both.efficiency_for_calculation
+
+
+        # Pick the MCG at both fade and calculate capacity. If the modem has no ACM function, let capacity
+        # at clear sky equals to capacity at both fade
+
+        # Else, pick MCG at clear sky and calculate capacity separately for clear sky condition.
+
+        # Seek the maximum total link availability if needed.
+
+        # --------------Record all parameters into the result object--------------------------
 
         # Record uplink budget parameters
         uplink.latitude = uplink_station.location.latitude
@@ -241,15 +308,16 @@ class Link:
         uplink.xpol_loss = self.xpol_loss()
         uplink.axial_ratio_loss = self.axial_ratio_loss()
         uplink.path_loss = uplink_path_loss
-        uplink.cloud_attenuation = uplink_atten.cloud()
-        uplink.gas_attenuation = uplink_atten.gas()
-        uplink.scin_attenuation = uplink_atten.scin()
-        uplink.rain_attenuation = uplink_atten.rain()
+        uplink.cloud_attenuation = uplink_atten.cloud
+        uplink.gas_attenuation = uplink_atten.gas
+        uplink.scin_attenuation = uplink_atten.scin
+        uplink.rain_attenuation = uplink_atten.rain
         uplink.noise_bandwidth = uplink_noise_bandwidth
 
         # Record satellite parameters
         sat = self.channel.uplink_beam.satellite
         satellite.name = sat.name
+        satellite.channel = self.channel.name
         satellite.orbital_slot = sat.orbital_slot
         satellite.half_station_keeping_box = sat.half_station_keeping_box
         satellite.channel_bandwidth = self.channel.bandwidth
@@ -282,58 +350,38 @@ class Link:
         downlink.xpol_loss = self.xpol_loss()
         downlink.axial_ratio_loss = self.axial_ratio_loss()
         downlink.path_loss = downlink_path_loss
-        downlink.cloud_attenuation = downlink_atten.cloud()
-        downlink.gas_attenuation = downlink_atten.gas()
-        downlink.scin_attenuation = downlink_atten.scin()
-        downlink.rain_attenuation = downlink_atten.rain()
+        downlink.cloud_attenuation = downlink_atten.cloud
+        downlink.gas_attenuation = downlink_atten.gas
+        downlink.scin_attenuation = downlink_atten.scin
+        downlink.rain_attenuation = downlink_atten.rain
         downlink.noise_bandwidth = downlink_noise_bandwidth
 
         # Record to C/N results
         clear_sky.cn_uplink = cn_uplink_clear
         clear_sky.cn_downlink = cn_downlink_clear
-        clear_sky.cn_total = self.carrier_over_noise_total(cn_uplink_clear, cn_downlink_clear)
+        clear_sky.cn_total = cn_total_clear_sky
+        clear_sky.mcg = modulation_clear_sky
+        clear_sky.capacity = capacity_clear_sky
         rain_down.cn_downlink = cn_downlink_rain
         rain_down.cn_uplink = cn_uplink_clear
-        rain_down.cn_total = self.carrier_over_noise_total(cn_uplink_clear, cn_downlink_rain)
+        rain_down.cn_total = cn_total_rain_down
+        rain_down.mcg = modulation_rain_down
+        rain_down.capacity = capacity_rain_down
         rain_up.cn_uplink = cn_uplink_rain
         rain_up.cn_downlink = cn_downlink_clear
-        rain_up.cn_total = self.carrier_over_noise_total(cn_uplink_rain, cn_downlink_clear)
+        rain_up.cn_total = cn_total_rain_up
+        rain_up.mcg = modulation_rain_up
+        rain_up.capacity = capacity_rain_up
         rain_both.cn_uplink = cn_uplink_rain
         rain_both.cn_downlink = cn_downlink_rain
-        rain_both.cn_total = self.carrier_over_noise_total(cn_uplink_rain, cn_downlink_rain)
+        rain_both.cn_total = cn_total_rain_both
+        rain_both.mcg = modulation_rain_both
+        rain_both.capacity = capacity_rain_both
+
+        # Record to Carrier results
+        carrier.bandwidth = self.bandwidth
 
 
-
-        # ---- C/I ----
-
-        # Compute the value of C/I from power source if it has default value of C/I3IM or NPR in the database.
-
-        # Compute C/I from satellite if it has default value of transponder's C/I3M or NPR
-
-        # Compute C/I uplink from adjacent satellites
-
-        # Compute C/I downlink from adjacent satellites
-
-        # Compute C/I uplink from adjacent cells
-
-        # Compute C/I downlink from adjacent cells
-
-        # ---- C/N Total ----
-
-        # Compute C/N Total (clear sky, up fade only, down fade only and both fade )
-
-        # ---- Capacity ----
-        # Compute link capacity (clear sky, up fade only, down fade only and both fade )
-        # in both MHz and Mbps
-
-        # Pick the MCG at both fade and calculate capacity. If the modem has no ACM function, let capacity
-        # at clear sky equals to capacity at both fade
-
-        # Else, pick MCG at clear sky and calculate capacity separately for clear sky condition.
-
-        # Seek the maximum total link availability if needed.
-
-        # Record all parameters into the result object
 
         return self.result
 
@@ -410,5 +458,5 @@ class Link:
     def cn_operation(*args):
         result = 0
         for cn in args:
-            result += 1 / (10 ** (cn / 10))
+            result += 1 / (10.0 ** (cn / 10.0))
         return -10 * log10(result)

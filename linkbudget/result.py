@@ -71,6 +71,7 @@ class UplinkResult(object):
 class SatelliteResult(object):
     def __init__(self):
         self.name = ""
+        self.channel = ""
         self.orbital_slot = 0
         self.half_station_keeping_box = 0
         self.channel_bandwidth = 0
@@ -145,6 +146,8 @@ class ClearSkyResult(object):
         self.ci_uplink = 0
         self.ci_downlink = 0
         self.cn_total = 0
+        self.mcg = ""
+        self.capacity = 0
 
 
 class RainUplinkResult(object):
@@ -154,6 +157,8 @@ class RainUplinkResult(object):
         self.ci_uplink = 0
         self.ci_downlink = 0
         self.cn_total = 0
+        self.mcg = ""
+        self.capacity = 0
 
 
 class RainDownlinkResult(object):
@@ -163,7 +168,8 @@ class RainDownlinkResult(object):
         self.ci_uplink = 0
         self.ci_downlink = 0
         self.cn_total = 0
-
+        self.mcg = ""
+        self.capacity = 0
 
 class RainBothResult(object):
     def __init__(self):
@@ -172,3 +178,5 @@ class RainBothResult(object):
         self.ci_uplink = 0
         self.ci_downlink = 0
         self.cn_total = 0
+        self.mcg = ""
+        self.capacity = 0

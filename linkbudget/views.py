@@ -21,14 +21,20 @@ def result(request):
     uplink = []
     downlink = []
     satellite = []
+    clear_sky = []
+    rain_up = []
+    rain_down = []
+    rain_both = []
     my_channel = Channel.objects.filter(name="1G").first()
     my_channel2 = Channel.objects.filter(name="207-FWD").first()
     my_station = Station.objects.filter(name="mystation").first()
     my_station2 = Station.objects.filter(name="mystation-cband").first()
-    my_link = Link(my_channel, None, 36, gateway=True, downlink_station=my_station2, operating_obo=-4)
-    my_link2 = Link(my_channel2, None, 57.375, gateway=True, downlink_station=my_station, operating_obo=-4 )
+    my_app = ModemOperationMode.objects.filter(name="Hub-Remote").first()
+    my_link = Link(my_channel, my_app, 36, gateway=True, downlink_station=my_station2, operating_obo=-4)
+    my_link2 = Link(my_channel2, my_app, 57.375, gateway=True, downlink_station=my_station, operating_obo=-4 )
     try:
-        link_result = my_link.calculate()
+        #link_result = my_link.calculate()
+        link_result = my_link2.calculate()
     except LinkCalcError, e:
         uplink.append(e.message)
     else:
@@ -70,6 +76,7 @@ def result(request):
 
         #---------------------------SATELLITE-----------------------------------------
         satellite.append("Name: {0}".format(link_result.satellite.name))
+        satellite.append("Channel: {0}".format(link_result.satellite.channel))
         satellite.append("Orbital Slot {0} degrees".format(str(link_result.satellite.orbital_slot)))
         satellite.append("SKB {0} degrees".format(str(link_result.satellite.half_station_keeping_box)))
         satellite.append("Channel Bandwidth {0} MHz".format(str(link_result.satellite.channel_bandwidth)))
@@ -109,8 +116,39 @@ def result(request):
         downlink.append("C/NdownlinkRain {0} dB".format(str(link_result.rain_both.cn_downlink)))
         downlink.append("C/NTotalClear {0} dB".format(str(link_result.clear_sky.cn_total)))
         downlink.append("C/NTotalRain {0} dB".format(str(link_result.rain_both.cn_total)))
+        
+        #------------------------CLEAR SKY------------------------------------------------
+        clear_sky.append("C/N Uplink {0} dB".format(str(link_result.clear_sky.cn_uplink)))
+        clear_sky.append("C/N Downlink {0} dB".format(str(link_result.clear_sky.cn_downlink)))
+        clear_sky.append("C/N Total {0} dB".format(str(link_result.clear_sky.cn_total)))
+        clear_sky.append("MCG: {0}".format(link_result.clear_sky.mcg.name))
+        clear_sky.append(("Capacity {0} Mbps".format(str(link_result.clear_sky.capacity))))
 
+        #--Rain up--
+        rain_up.append("C/N Uplink {0} dB".format(str(link_result.rain_up.cn_uplink)))
+        rain_up.append("C/N Downlink {0} dB".format(str(link_result.rain_up.cn_downlink)))
+        rain_up.append("C/N Total {0} dB".format(str(link_result.rain_up.cn_total)))
+        rain_up.append("MCG: {0}".format(link_result.rain_up.mcg.name))
+        rain_up.append(("Capacity {0} Mbps".format(str(link_result.rain_up.capacity))))
+
+        #--Rain down--
+        rain_down.append("C/N Uplink {0} dB".format(str(link_result.rain_down.cn_uplink)))
+        rain_down.append("C/N Downlink {0} dB".format(str(link_result.rain_down.cn_downlink)))
+        rain_down.append("C/N Total {0} dB".format(str(link_result.rain_down.cn_total)))
+        rain_down.append("MCG: {0}".format(link_result.rain_down.mcg.name))
+        rain_down.append("Capacity {0} Mbps".format(str(link_result.rain_down.capacity)))
+
+        #--Rain both--
+        rain_both.append("C/N Uplink {0} dB".format(str(link_result.rain_both.cn_uplink)))
+        rain_both.append("C/N Downlink {0} dB".format(str(link_result.rain_both.cn_downlink)))
+        rain_both.append("C/N Total {0} dB".format(str(link_result.rain_both.cn_total)))
+        rain_both.append("MCG: {0}".format(link_result.rain_both.mcg.name))
+        rain_both.append("Capacity {0} Mbps".format(str(link_result.rain_both.capacity)))
 
     return render(request, "linkbudget/result.html", {"uplink": uplink,
                                                       "downlink": downlink,
-                                                      "satellite": satellite})
+                                                      "satellite": satellite,
+                                                      "clear_sky": clear_sky,
+                                                      "rain_up": rain_up,
+                                                      "rain_down": rain_down,
+                                                      "rain_both": rain_both})

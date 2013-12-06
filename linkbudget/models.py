@@ -1,4 +1,4 @@
-from math import pi, log10
+from math import pi, log10, sin, cos, sqrt, atan, tan
 from django.db import models
 from django.core.validators import MinValueValidator
 from linkcalc import LinkCalcError
@@ -31,6 +31,7 @@ BEAM_TYPE_CHOICES = (
 )
 
 # TODO: Write comments and validators for the models
+
 
 class FrequencyBand(models.Model):
     """
@@ -74,8 +75,79 @@ class Satellite(models.Model):
         """
         Returns elevation angle from given lat, lon to this satellite
         """
-        # TODO Write this function
-        return 30
+        # Function to find parameters for satellite-earth geometry
+        # Based on methods derived by GEOM Spreadsheet
+        # Paiboon P. 30 November 1999
+        
+        # INPUT
+        # es_lat = latitude of earth station in degree (positive in North)
+        # es_lon = longitude of earth station in degree (positive in East)
+        # sat_lon = longitude of satellite in degree (positive in East)
+        
+        # Constants
+        degrees_to_radians = pi / 180
+        radians_to_degrees = 180 / pi
+        equatorial_earth_radius = 6378144  # Equatorial Earth Radius in meters; changed from 6378159.9
+        geo_altitude_radius = 42164500  # Radius at Geosynchronous Altitude; changed from 42166454
+        earth_oblateness = 1 / 298.257  # Earth Oblateness
+        
+        # Calculates basic parameters
+        dif_lon = lon - self.orbital_slot
+        x_1 = equatorial_earth_radius * cos(lat * degrees_to_radians) / sqrt(1 - (2 - earth_oblateness) * earth_oblateness * sin(lat * degrees_to_radians) ** 2)
+        x_2 = geo_altitude_radius * cos(dif_lon * degrees_to_radians)
+        y_2 = geo_altitude_radius * sin(dif_lon * degrees_to_radians)
+        z_1 = (1 - earth_oblateness) ** 2 * equatorial_earth_radius * sin(lat * degrees_to_radians) / sqrt(1 - (2 - earth_oblateness) * earth_oblateness * sin(lat * degrees_to_radians) ** 2)
+        slant_range = sqrt((x_2 - x_1) ** 2 + y_2 ** 2 + z_1 ** 2) / 1000
+        
+        # Calculates elevation angle
+        re_prime = sqrt(x_1 ** 2 + z_1 ** 2)
+        cos_el = (re_prime ** 2 + (slant_range * 1000) ** 2 - geo_altitude_radius ** 2) / (2 * re_prime * slant_range * 1000)
+        elevation = (atan(-cos_el / sqrt(-cos_el * cos_el + 1)) + 2 * atan(1)) * radians_to_degrees
+        if elevation > 90:
+            return elevation - 90
+        else:
+            return elevation
+
+    def azimuth_angle(self, lat, lon):
+        """
+        Returns azimuth angle from given lat, lon to this satellite
+        """
+        # Function to find parameters for satellite-earth geometry
+        # Based on methods derived by GEOM Spreadsheet
+        # Paiboon P. 30 November 1999
+
+        # INPUT
+        # es_lat = latitude of earth station in degree (positive in North)
+        # es_lon = longitude of earth station in degree (positive in East)
+        # sat_lon = longitude of satellite in degree (positive in East)
+
+        # Constants
+        degrees_to_radians = pi / 180
+        radians_to_degrees = 180 / pi
+
+        # Calculates longitude difference
+        dif_lon = lon - self.orbital_slot
+
+        # Calculates azimuth angle
+        if dif_lon == 0:
+            if lat <= 0:
+                return 0
+            else:
+                return 180
+        elif lat == 0:
+            if dif_lon < 0:
+                return 90
+            else:
+                return 270
+        else:
+            cosctr_ang = cos(dif_lon * degrees_to_radians) * cos(lat * degrees_to_radians)
+            acos_ctr = atan(-cosctr_ang / sqrt(-cosctr_ang * cosctr_ang + 1)) + 2 * atan(1)
+            cos_ga = -tan(lat * degrees_to_radians) / tan(acos_ctr)
+            ga = (atan(-cos_ga / sqrt(-cos_ga * cos_ga + 1)) + 2 * atan(1)) * radians_to_degrees
+            if dif_lon < 0:
+                return ga
+            else:
+                return 360 - ga
 
     def __str__(self):
         return self.name
@@ -708,8 +780,39 @@ class ModemApplication(models.Model):
     rolloff_factor = models.FloatField(help_text="Roll-off factor from modem's specification")
     rolloff_factor_from_test = models.FloatField("Roll-off factor from real performance.")
     link_margin = models.FloatField(help_text="Default link margin for this application in dB")
-    default = models.BooleanField(help_text="True if this application is default for the modem. For modem with hub "
-                                            "system, both forward and return application should set this to True.")
+
+    def get_best_mcg(self, cn_total, link_margin=None):
+        """
+        Returns best mcg from given C/N total and link margin
+        """
+        # If link margin is not given, use the application's default link margin (this is common case)
+        if not link_margin:
+            link_margin = self.link_margin
+
+        # Check if this application is set to use value from real operation test
+        if self.use_value_from_test:
+            return self.mcg_set.filter(cn_threshold_from_test__lte=cn_total-link_margin).order_by('efficiency_from_test').last()
+        else:
+            return self.mcg_set.filter(cn_threshold__lte=cn_total-link_margin).order_by('efficiency').last()
+
+    @property
+    def use_value_from_test(self):
+        try:
+            self._use_value_from_test
+        except AttributeError:
+            self._use_value_from_test = False
+        return self._use_value_from_test
+
+    # Set this attribute to True will seek
+    @use_value_from_test.setter
+    def use_value_from_test(self, value):
+        self._use_value_from_test = value
+
+    @property
+    def rolloff_factor_for_calculation(self):
+        if self.use_value_from_test:
+            return self.rolloff_factor_from_test
+        return self.rolloff_factor
 
     def __str__(self):
         return "{0}: {1}".format(self.modem, self.name)
@@ -741,6 +844,28 @@ class MCG(models.Model):
     cn_threshold_from_test = models.FloatField(help_text="C/N required for this MCG from the real test. Put the same"
                                                          "value as the modem's specification if no test provided")
 
+    @property
+    def efficiency_for_calculation(self):
+        if self.application.use_value_from_test:
+            return self.efficiency_from_test
+        return self.efficiency
+
     def __str__(self):
         return "{0} - {1}".format(self.application, self.name)
 
+
+
+
+class ModemOperationMode(models.Model):
+    """
+    Represents a modem operation mode or network topology which modem can provides.
+    Ex. Hub-Remote operation will have outbound application as its forward and inbound application as its return
+    """
+    name = models.CharField(max_length=50)
+    modem = models.ForeignKey(Modem)
+    forward_application = models.ForeignKey(ModemApplication, related_name='+')
+    return_application = models.ForeignKey(ModemApplication, related_name='+', null=True, blank=True) # 1-Way link can let this blank
+    default = models.BooleanField(help_text="True if this operation mode is default for the modem.")
+
+    def __str__(self):
+        return "{0} - {1}".format(self.modem, self.name)
