@@ -135,7 +135,7 @@ class UplinkInterferencesResult(object):
 class DownlinkInterferencesResult(object):
     def __init__(self):
         self.adjacent_cells = 50
-        self.adjacent_cells = 50
+        self.adjacent_satellite = 50
         self.intermodulation = 50
 
 

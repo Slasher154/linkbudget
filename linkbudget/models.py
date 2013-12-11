@@ -256,10 +256,6 @@ class Transponder(models.Model):
     primary_mode = models.CharField(max_length=10, choices=MODE_CHOICE, default="None")
     secondary_mode = models.CharField(max_length=10, choices=MODE_CHOICE, null=True)
 
-    def __str__(self):
-        return "{0}: {1}".format(self.satellite.name, self.name)
-
-
     def ibo_at_specific_obo(self, requested_obo):
         """
         Returns input backoff of the transponder at specific output backoff
@@ -305,6 +301,28 @@ class Transponder(models.Model):
 
     def validate_transponder_mode(self, mode):
         return str(mode).lower() in (self.primary_mode.lower(), self.secondary_mode.lower())
+
+    def carrier_over_interferences(self, num_carriers, obo):
+        """
+        Returns C/I from transponder TWTA/SSPA from given number of carriers
+        """
+        tp_chars = self.transpondercharacteristic_set.filter(output_backoff__lte=obo).order_by('output_backoff')
+        if tp_chars.exists():
+            tc = tp_chars.first()
+            if num_carriers == 1:
+                return 50
+            elif num_carriers == 2:
+                return tc.c_3im
+            elif num_carriers > 2:
+                return tc.npr
+            else:
+                raise LinkCalcError("Invalid number of carriers")
+            return tp_chars.last().output_backoff
+        else:
+            raise LinkCalcError("The input OBO is higher than transponder characteristics in our database")
+
+    def __str__(self):
+        return "{0}: {1}".format(self.satellite.name, self.name)
 
 
 class AlcFullLoadBackoff(models.Model):
@@ -477,6 +495,7 @@ class Channel(models.Model):
         """
         return self.type == 'Return'
 
+
 class AntennaVendor(models.Model):
     """
     Represents an antenna Antenna
@@ -642,8 +661,10 @@ class Gateway(models.Model):
     purpose = models.CharField(max_length=20, choices=PURPOSE_CHOICE)
     antenna = models.ForeignKey(Antenna, null=True)
     location = models.ForeignKey(Location, null=True)
-    diversity_gateway = models.ForeignKey('self', help_text="Select the diversity gateway if any", blank=True,
+    diversity_gateway = models.ForeignKey('self', help_text="Select the diversity gateway if any.", blank=True,
                                           null=True)
+    site_separation = models.FloatField(default=0, null=True, blank=True, help_text="Input zero if this gateway has "
+                                                                                    "no site diversity ")
 
     def get_hpa_for_channel(self, channel):
         """
@@ -673,6 +694,16 @@ class Gateway(models.Model):
         station.location = self.location
         station.name = self.name
         return station
+
+    def availability(self, single_site_availability):
+        """
+        Returns link availability of this gateway
+        """
+        if self.diversity_gateway:
+            beta_factor_square = 0.0001 * (self.site_separation ** 1.33)
+            single_site_unavailability = 100 - single_site_availability
+            return 100 - (single_site_unavailability / (1 + 100 * beta_factor_square / single_site_unavailability))
+        return single_site_availability
 
     def __str__(self):
         return "{0}-{1} : {2}".format(self.name, self.purpose, self.location)
@@ -717,6 +748,18 @@ class Hpa(models.Model):
             raise LinkCalcError("UPC of HPA {0} ({1} dB) should be more than zero.".format(self.name, str(upc)))
         return 10 ** ((self.output_power + obo + ifl - upc) / 10)
 
+    def carrier_over_interferences(self, num_carriers):
+        """
+        Returns C/I uplink of this HPA if uplink a given number of carriers
+        """
+        if num_carriers == 1:
+            return 50
+        elif num_carriers == 2:
+            return self.c_im3
+        elif num_carriers > 2:
+            return self.npr
+        else:
+            raise LinkCalcError("Invalid number of carriers")
 
     def __str__(self):
         return "{0} - {1} W".format(self.name, str(int(self.output_power)))

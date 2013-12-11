@@ -31,7 +31,7 @@ def result(request):
     my_station2 = Station.objects.filter(name="mystation-cband").first()
     my_app = ModemOperationMode.objects.filter(name="Hub-Remote").first()
     my_link = Link(my_channel, my_app, 36, gateway=True, downlink_station=my_station2, operating_obo=-4)
-    my_link2 = Link(my_channel2, my_app, 57.375, gateway=True, downlink_station=my_station, operating_obo=-4 )
+    my_link2 = Link(my_channel2, my_app, 57.375, gateway=True, downlink_station=my_station, operating_obo=-4, num_carriers_in_transponder=2)
     try:
         #link_result = my_link.calculate()
         link_result = my_link2.calculate()
@@ -120,6 +120,8 @@ def result(request):
         #------------------------CLEAR SKY------------------------------------------------
         clear_sky.append("C/N Uplink {0} dB".format(str(link_result.clear_sky.cn_uplink)))
         clear_sky.append("C/N Downlink {0} dB".format(str(link_result.clear_sky.cn_downlink)))
+        clear_sky.append("C/I Uplink {0} dB".format(str(link_result.clear_sky.ci_uplink)))
+        clear_sky.append("C/I Downlink {0} dB".format(str(link_result.clear_sky.ci_downlink)))
         clear_sky.append("C/N Total {0} dB".format(str(link_result.clear_sky.cn_total)))
         clear_sky.append("MCG: {0}".format(link_result.clear_sky.mcg.name))
         clear_sky.append(("Capacity {0} Mbps".format(str(link_result.clear_sky.capacity))))
@@ -127,6 +129,8 @@ def result(request):
         #--Rain up--
         rain_up.append("C/N Uplink {0} dB".format(str(link_result.rain_up.cn_uplink)))
         rain_up.append("C/N Downlink {0} dB".format(str(link_result.rain_up.cn_downlink)))
+        rain_up.append("C/I Uplink {0} dB".format(str(link_result.rain_up.ci_uplink)))
+        rain_up.append("C/I Downlink {0} dB".format(str(link_result.rain_up.ci_downlink)))
         rain_up.append("C/N Total {0} dB".format(str(link_result.rain_up.cn_total)))
         rain_up.append("MCG: {0}".format(link_result.rain_up.mcg.name))
         rain_up.append(("Capacity {0} Mbps".format(str(link_result.rain_up.capacity))))
@@ -134,6 +138,8 @@ def result(request):
         #--Rain down--
         rain_down.append("C/N Uplink {0} dB".format(str(link_result.rain_down.cn_uplink)))
         rain_down.append("C/N Downlink {0} dB".format(str(link_result.rain_down.cn_downlink)))
+        rain_down.append("C/I Uplink {0} dB".format(str(link_result.rain_down.ci_uplink)))
+        rain_down.append("C/I Downlink {0} dB".format(str(link_result.rain_down.ci_downlink)))
         rain_down.append("C/N Total {0} dB".format(str(link_result.rain_down.cn_total)))
         rain_down.append("MCG: {0}".format(link_result.rain_down.mcg.name))
         rain_down.append("Capacity {0} Mbps".format(str(link_result.rain_down.capacity)))
@@ -141,6 +147,8 @@ def result(request):
         #--Rain both--
         rain_both.append("C/N Uplink {0} dB".format(str(link_result.rain_both.cn_uplink)))
         rain_both.append("C/N Downlink {0} dB".format(str(link_result.rain_both.cn_downlink)))
+        rain_both.append("C/I Uplink {0} dB".format(str(link_result.rain_both.ci_uplink)))
+        rain_both.append("C/I Downlink {0} dB".format(str(link_result.rain_both.ci_downlink)))
         rain_both.append("C/N Total {0} dB".format(str(link_result.rain_both.cn_total)))
         rain_both.append("MCG: {0}".format(link_result.rain_both.mcg.name))
         rain_both.append("Capacity {0} Mbps".format(str(link_result.rain_both.capacity)))

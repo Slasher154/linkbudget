@@ -413,11 +413,11 @@ class Attenuation(object):
         else:
             raise LinkCalcError("Polarizaion is invalid.")
 
-    def excel_match(self, list, value):
+    def excel_match(self, input_list, value):
         """
         Returns 2 indices of the given sorted list which have the number sandwiches the given value
         """
-        for k, m in enumerate(list):
+        for k, m in enumerate(input_list):
             if m > value:
                 idx, idx2 = k-1, k
                 break
