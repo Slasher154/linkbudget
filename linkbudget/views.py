@@ -27,14 +27,17 @@ def result(request):
     rain_both = []
     my_channel = Channel.objects.filter(name="1G").first()
     my_channel2 = Channel.objects.filter(name="207-FWD").first()
+    my_channel3 = Channel.objects.filter(name="207-RTN").first()
     my_station = Station.objects.filter(name="mystation").first()
     my_station2 = Station.objects.filter(name="mystation-cband").first()
     my_app = ModemOperationMode.objects.filter(name="Hub-Remote").first()
     my_link = Link(my_channel, my_app, 36, gateway=True, downlink_station=my_station2, operating_obo=-4)
     my_link2 = Link(my_channel2, my_app, 57.375, gateway=True, downlink_station=my_station, operating_obo=-4, num_carriers_in_transponder=2)
+    my_link3 = Link(my_channel3, my_app, 2.5, gateway=True, uplink_station=my_station, operating_obo=-9.5)
     try:
         #link_result = my_link.calculate()
-        link_result = my_link2.calculate()
+        #link_result = my_link2.calculate()
+        link_result = my_link3.calculate()
     except LinkCalcError, e:
         uplink.append(e.message)
     else:
@@ -85,6 +88,7 @@ def result(request):
         satellite.append("IBO {0} dB".format(str(link_result.satellite.channel_input_backoff)))
         satellite.append("OBO {0} dB".format(str(link_result.satellite.channel_output_backoff)))
         satellite.append("Carrier OBO {0} dB".format(str(link_result.satellite.carrier_output_backoff)))
+        satellite.append("Deepin {0} dB".format(str(link_result.satellite.deepin_per_carrier)))
         satellite.append("Operating Mode: {0}".format(link_result.satellite.channel_operating_mode))
         satellite.append("Peak Saturated EIRP {0} dBW".format(str(link_result.satellite.peak_saturated_eirp)))
         satellite.append("Gain variation {0} dB".format(str(link_result.satellite.gain_variation)))

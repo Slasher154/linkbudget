@@ -81,6 +81,7 @@ class SatelliteResult(object):
         self.channel_output_backoff = 0
         self.carrier_input_backoff = 0
         self.carrier_output_backoff = 0
+        self.deepin_per_carrier = 0
         self.channel_operating_mode = ""
         self.peak_saturated_eirp = 0
         self.gain_variation = 0

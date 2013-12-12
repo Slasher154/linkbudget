@@ -384,6 +384,7 @@ class Channel(models.Model):
         ('Broadcast', 'Broadcast')
     )
     type = models.CharField(max_length=30, choices=CHANNEL_TYPE_CHOICES)
+    default_gateway = models.ForeignKey("Gateway", null=True, blank=True, help_text="Default gateway for this channel.")
     
     def seek_optimized_pfd_uplink(self, carrier_bandwidth, uplink_gt):
         """
@@ -422,8 +423,7 @@ class Channel(models.Model):
             return ibo_per_carrier - self.operating_ibo + self.operating_obo
         elif self.operating_mode == "ALC":
             # Check if given PFD reaches deep-in or not
-            min_sfd = self.sfd_channel_at_uplink_location(uplink_gt) - self.transponder.dynamic_range
-            deepin = uplink_pfd - min_sfd  # Not reach deepin dynamic range
+            deepin = self.deepin_per_carrier(uplink_pfd, uplink_gt, carrier_bandwidth)
             if deepin < 0:
                 return self.operating_obo - 10 * log10(self.bandwidth / carrier_bandwidth) + deepin
             else:
@@ -431,11 +431,20 @@ class Channel(models.Model):
         else:
             raise LinkCalcError("No valid operating mode specified for channel {0}".format(self.name))
 
+    def deepin_per_carrier(self, uplink_pfd, uplink_gt, carrier_bandwidth):
+        """
+        Returns deepin dynamric range from given PFD
+        """
+        if self.operating_mode == "ALC":
+            min_sfd = self.sfd_channel_at_uplink_location(uplink_gt) - self.transponder.dynamic_range
+            return uplink_pfd - min_sfd  # Not reach deepin dynamic range
+        else:
+            return "N/A"
 
     def eirp_downlink_at_peak_per_carrier(self, uplink_pfd, uplink_gt, carrier_bandwidth):
         return self.downlink_beam.peak_sat_eirp + self.obo_per_carrier(uplink_pfd, uplink_gt, carrier_bandwidth)
 
-    def default_gateway(self):
+    def default_gateway2(self):
         """
         Returns default gateway for this channel
         """
@@ -454,9 +463,6 @@ class Channel(models.Model):
     @attenuation.setter
     def attenuation(self, value):
         self._attenuation = value
-
-    def __str__(self):
-        return "{0} | {1} | {2}".format(self.uplink_beam.satellite, self.uplink_beam.name, self.transponder.name)
 
     @property
     def operating_mode(self):
@@ -495,6 +501,14 @@ class Channel(models.Model):
         """
         return self.type == 'Return'
 
+    def __str__(self):
+        """
+        if self.is_forward:
+            beam = self.downlink_beam.name
+        else:
+            beam = self.uplink_beam.name
+        """
+        return "{0} | {1}".format(self.uplink_beam.satellite, self.name)
 
 class AntennaVendor(models.Model):
     """
@@ -685,9 +699,14 @@ class Gateway(models.Model):
         """
         Returns a station object used to uplink into given channel from the gateway object
         """
-        hpa = self.get_hpa_for_channel(channel)
-        if not hpa:
-            return None
+        # Find the associated HPA for this channel if it is forward channel
+        if channel.is_forward:
+            hpa = self.get_hpa_for_channel(channel)
+            if not hpa:
+                return None
+        # Return channel do not need any HPA
+        else:
+            hpa = None
         station = Station()
         station.antenna = self.antenna
         station.hpa = hpa
