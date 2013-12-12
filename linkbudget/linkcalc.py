@@ -460,7 +460,7 @@ class Link:
         return 0.1
 
     def axial_ratio_loss(self):
-        return 0
+        return 20 - 20
 
     def noise_bandwidth(self, bandwidth):
         """
