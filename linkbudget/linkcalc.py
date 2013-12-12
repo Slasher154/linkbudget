@@ -98,7 +98,7 @@ class Link:
 
         # Use default gateway if gateway is true
         elif self.gateway and self.channel.is_forward:
-            uplink_gateway = self.channel.default_gateway()
+            uplink_gateway = self.channel.default_gateway
             uplink_station = uplink_gateway.convert_to_station(self.channel)
             if not uplink_station:
                 raise LinkCalcError("There is no default gateway for channel {0}".format(self.channel.name))
@@ -179,7 +179,7 @@ class Link:
 
         # Use default gateway if gateway is true
         elif self.gateway and self.channel.is_return:
-            downlink_gateway = self.channel.default_gateway()
+            downlink_gateway = self.channel.default_gateway
             downlink_station = downlink_gateway.convert_to_station(self.channel)
             if not downlink_station:
                 raise LinkCalcError("There is no default gateway for channel {0}".format(self.channel.name))
@@ -339,6 +339,7 @@ class Link:
         satellite.channel_output_backoff = self.channel.operating_obo
         satellite.channel_operating_mode = self.channel.operating_mode
         satellite.carrier_output_backoff = self.channel.obo_per_carrier(uplink_pfd, uplink_gt, self.bandwidth)
+        satellite.deepin_per_carrier = self.channel.deepin_per_carrier(uplink_pfd, uplink_gt, self.bandwidth)
         satellite.peak_saturated_eirp = self.channel.downlink_beam.peak_sat_eirp
         satellite.gain_variation = 0
 
@@ -409,7 +410,8 @@ class Link:
         # Record to Carrier results
         carrier.bandwidth = self.bandwidth
 
-
+        # New algorithm here
+        changes = 1 + 1
 
         return self.result
 
@@ -458,7 +460,7 @@ class Link:
         return 0.1
 
     def axial_ratio_loss(self):
-        return 0
+        return 20 - 20
 
     def noise_bandwidth(self, bandwidth):
         """
