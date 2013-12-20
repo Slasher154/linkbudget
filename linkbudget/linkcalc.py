@@ -1,10 +1,9 @@
 __author__ = 'thanatv'
 
 # Main class for link calculation.
-from linkbudget.result import LinkResult
 from math import log10, pi
+from utilities import wavelength, cn_operation
 from linkbudget.itu_r import Attenuation
-
 
 # Link budget constants
 BOLTZMANN_CONSTANT = -228.6  # dBJ/K
@@ -44,449 +43,793 @@ class Link:
         self.force_operating_mode = force_operating_mode
         self.force_contour = force_contour
         self.operating_obo = operating_obo
-        self.result = LinkResult()
+        self.uplink = Uplink(self)
+        self.downlink = Downlink(self)
+        self.satellite = Satellite(self)
+        self._carrier_over_noise_total_clear_sky = None
+        self._carrier_over_noise_total_rain_up = None
+        self._carrier_over_noise_total_rain_down = None
+        self._carrier_over_noise_total_rain_both = None
 
     def calculate(self):
-        """
+        self.uplink.relative_contour = 0
+        self.downlink.relative_contour = 0
+        self.set_uplink_station()
+        self.set_downlink_station()
+        self.optimize_power()
 
-        :return: LinkResult
-        """
-        uplink = self.result.uplink
-        downlink = self.result.downlink
-        satellite = self.result.satellite
-        carrier = self.result.carrier
-        uplink_interferences = self.result.uplink_interferences
-        downlink_interferences = self.result.downlink_interferences
-        clear_sky = self.result.clear_sky
-        rain_up = self.result.rain_up
-        rain_down = self.result.rain_down
-        rain_both = self.result.rain_both
+    @property
+    def carrier_over_noise_total_clear_sky(self):
+        if self._carrier_over_noise_total_clear_sky is None:
+            self._carrier_over_noise_total_clear_sky = cn_operation(self.uplink.carrier_over_noise_clear_sky, self.uplink.carrier_over_interferences_total, self.downlink.carrier_over_noise_clear_sky, self.downlink.carrier_over_interferences_total)
+        return self._carrier_over_noise_total_clear_sky
 
-        # Runs validation
-        try:
-            self.validate()
-        except LinkCalcError, e:
-            raise LinkCalcError("Validation error. {0}".format(e.message))
+    @property
+    def carrier_over_noise_total_rain_up(self):
+        if self._carrier_over_noise_total_rain_up is None:
+            self._carrier_over_noise_total_rain_up = cn_operation(self.uplink.carrier_over_noise_rain, self.uplink.carrier_over_interferences_total, self.downlink.carrier_over_noise_clear_sky, self.downlink.carrier_over_interferences_total)
+        return self._carrier_over_noise_total_rain_up
 
-        # Seek the optimized uplink power. This is the default case unless
-        # is_power_optimized is explicitly assigned false.
-        # Ex. the IPSTAR return channel normally calculates with full BUC power
-        # so no power optimization required.
-        uplink_gt = self.channel.uplink_beam.peak_gt  # Beam peak
-        uplink_frequency = self.channel.uplink_center_frequency
-        uplink_availability_single_site = 99.38
-        downlink_frequency = self.channel.downlink_center_frequency
-        downlink_availability_single_site = 99.5
+    @property
+    def carrier_over_noise_total_rain_down(self):
+        if self._carrier_over_noise_total_rain_down is None:
+            self._carrier_over_noise_total_rain_down = cn_operation(self.uplink.carrier_over_noise_rain, self.uplink.carrier_over_interferences_total, self.downlink.carrier_over_noise_rain, self.downlink.carrier_over_interferences_total)
+        return self._carrier_over_noise_total_rain_down
 
-        # If the operating mode is not forced by user (which should be a normal case), use the transponder's primary
-        # mode
-        if self.force_operating_mode:
-            self.channel.operating_mode = self.force_operating_mode
-        else:
-            self.channel.operating_mode = self.channel.transponder.primary_mode
+    @property
+    def carrier_over_noise_total_rain_both(self):
+        if self._carrier_over_noise_total_rain_both is None:
+            self._carrier_over_noise_total_rain_both = cn_operation(self.uplink.carrier_over_noise_rain, self.uplink.carrier_over_interferences_total, self.downlink.carrier_over_noise_rain, self.downlink.carrier_over_interferences_total)
+        return self._carrier_over_noise_total_rain_both
 
-        # ---- C/N Uplink ----
-
-        # Set uplink parameters
-
+    def set_uplink_station(self):
         # For forward or broadcast channel, check whether the uplink station or gateway is specified
         # Import the models here to prevent circular import (two module imports class from each other)
         # http://stackoverflow.com/questions/10212929/import-error-on-django-models-py
         from linkbudget.models import Station
         if isinstance(self.uplink_station, Station):
-            uplink_station = self.uplink_station
+            self.uplink.station = self.uplink_station
 
         # Use default gateway if gateway is true
         elif self.gateway and self.channel.is_forward:
             uplink_gateway = self.channel.default_gateway
-            uplink_station = uplink_gateway.convert_to_station(self.channel)
-            if not uplink_station:
+            self.uplink.station = uplink_gateway.convert_to_station(self.channel)
+            if not self.uplink.station:
                 raise LinkCalcError("There is no default gateway for channel {0}".format(self.channel.name))
         else:
             raise LinkCalcError("No uplink station provided.")
 
-        station_eirp = uplink_station.uplink_eirp(uplink_frequency)
-
-        # Find optimized PFD if power optimization is true
-        if self.power_optimization:
-            optimized_pfd = self.channel.seek_optimized_pfd_uplink(self.bandwidth, uplink_gt)
-            # TODO: Write a function for exact slant range
-            # If power overused is specified, EIRP required will increase based on that overused power
-            spreading_loss = self.spreading_loss(GEOSYNCHRONOUS_ALTITUDE)
-            optimized_eirp = optimized_pfd + spreading_loss + self.power_overused
-
-            # Uplink EIRP will be limited at optimized EIRP if station has higher power
-            # Else, the station is underused power
-            if station_eirp > optimized_eirp:
-                uplink_eirp = optimized_eirp
-            else:  # underused power or overused but less than given value
-                uplink_eirp = station_eirp
-
-        else:
-            uplink_eirp = station_eirp
-
-        # Calculates PFD
-        uplink_pfd = uplink_eirp - self.spreading_loss(GEOSYNCHRONOUS_ALTITUDE)
-
-        # Declare local variables for uplink station lat/lon
-        uplink_lat = uplink_station.location.latitude
-        uplink_lon = uplink_station.location.longitude
-
-        # Finds uplink relative contour of the station
-        uplink_contour = self.channel.uplink_beam.get_contour(uplink_lat, uplink_lon)
-
-        # Calculates path losses
-        uplink_path_loss = self.path_loss(GEOSYNCHRONOUS_ALTITUDE, uplink_frequency)
-
-        # Calculates noise bandwidth
-        uplink_noise_bandwidth = self.noise_bandwidth(self.bandwidth)
-
-        # Calculates atmospheric attenuation
-        uplink_atten = Attenuation(uplink_frequency, self.channel.uplink_beam.satellite.elevation_angle(uplink_lat,
-                                                                                                        uplink_lon),
-                                   uplink_station.antenna.diameter, self.channel.uplink_beam.polarization,
-                                   uplink_availability_single_site, uplink_lat, uplink_lon)
-
-        # Calculates uplink availability
-        if self.gateway and self.channel.is_forward:
-            uplink_availability = uplink_gateway.availability(uplink_availability_single_site)
-        else:
-            uplink_availability = uplink_availability_single_site
-
-        # Compute C/N Uplink (clear sky and rain fade)
-        cn_uplink_without_atten = uplink_eirp + uplink_gt + uplink_contour - uplink_path_loss - uplink_noise_bandwidth \
-            - BOLTZMANN_CONSTANT
-        cn_uplink_clear = cn_uplink_without_atten - uplink_atten.total_clear_sky
-        cn_uplink_rain = cn_uplink_without_atten - uplink_atten.total_rain
-
-        # ---- C/N Downlink ----
-
-        # Compute EIRP downlink of the channel from uplink power flux density and satellite settings
-        downlink_eirp_at_peak = self.channel.eirp_downlink_at_peak_per_carrier(uplink_pfd, uplink_gt, self.bandwidth)
-
-        # For return channel, check whether the downlink station is specified.
-        # If not, use the default gateway of the channel
-        # If downlink station is specified, check the following for usage compatibility:
-        # 1. Antenna's receive frequency range and polarization matches the beam
-        # 2. Downlink location is in the beam coverage
-        # Return error if requirements are not met
-
-        # Compute C/N Downlink (clear sky, up fade only, down fade only and both fade from default availability)
-
+    def set_downlink_station(self):
+        from linkbudget.models import Station
         # Check if downlink station is given
         if isinstance(self.downlink_station, Station):
-            downlink_station = self.downlink_station
+            self.downlink.station = self.downlink_station
 
         # Use default gateway if gateway is true
         elif self.gateway and self.channel.is_return:
             downlink_gateway = self.channel.default_gateway
-            downlink_station = downlink_gateway.convert_to_station(self.channel)
-            if not downlink_station:
+            self.downlink.station = downlink_gateway.convert_to_station(self.channel)
+            if not self.downlink.station:
                 raise LinkCalcError("There is no default gateway for channel {0}".format(self.channel.name))
         else:
             raise LinkCalcError("No downlink station provided.")
 
-        # Declare local variables for uplink station lat/lon
-        downlink_lat = downlink_station.location.latitude
-        downlink_lon = downlink_station.location.longitude
-
-        # Finds downlink relative contour of the station
-        downlink_contour = self.channel.downlink_beam.get_contour(downlink_lat, downlink_lon)
-
-        # Finds noise temp at rain
-        # TODO: Modify this
-        noise_temp_at_rain = 220
-
-        # Calculates downlink G/T at clear sky and rain fade
-        downlink_gt_clear_sky = downlink_station.antenna.gt(downlink_frequency, self.channel.uplink_beam.satellite.elevation_angle(downlink_lat, downlink_lon))
-        downlink_gt_rain = downlink_station.antenna.gt(downlink_frequency, self.channel.uplink_beam.satellite.elevation_angle(downlink_lat, downlink_lon), noise_temp=noise_temp_at_rain)
-
-        # Calculates path losses
-        downlink_path_loss = self.path_loss(GEOSYNCHRONOUS_ALTITUDE, downlink_frequency)
-
-        # Calculates noise bandwidth
-        downlink_noise_bandwidth = self.noise_bandwidth(self.bandwidth)
-
-        # Calculates atmospheric attenuation
-        downlink_atten = Attenuation(downlink_frequency, self.channel.downlink_beam.satellite.elevation_angle
-            (downlink_lat, downlink_lon), downlink_station.antenna.diameter, self.channel.downlink_beam.polarization, downlink_availability_single_site, downlink_lat, downlink_lon)
-
-        # Calculates downlink availability
-        if self.gateway and self.channel.is_return:
-            downlink_availability = downlink_gateway.availability(downlink_availability_single_site)
-        else:
-            downlink_availability = downlink_availability_single_site
-
-        # Compute C/N downlink (clear sky and rain fade)
-        cn_downlink_without_atten_clear = downlink_eirp_at_peak + downlink_gt_clear_sky + downlink_contour - downlink_path_loss - downlink_noise_bandwidth \
-            - BOLTZMANN_CONSTANT
-        cn_downlink_without_atten_rain = downlink_eirp_at_peak + downlink_gt_rain + downlink_contour - downlink_path_loss - downlink_noise_bandwidth \
-            - BOLTZMANN_CONSTANT
-        cn_downlink_clear = cn_downlink_without_atten_clear - downlink_atten.total_clear_sky
-        cn_downlink_rain = cn_downlink_without_atten_rain - downlink_atten.total_rain
-
-         # ---- C/I ----
-        # TODO: Write these function
-
-        # Compute the value of C/I from power source if it has default value of C/I3IM or NPR in the database.
-        ci_uplink_amplifier = uplink_station.hpa.carrier_over_interferences(self.num_carriers_in_transponder)
-
-        # Compute C/I from satellite if it has default value of transponder's C/I3M or NPR
-        ci_transponder_amplifier = self.channel.transponder.carrier_over_interferences(self.num_carriers_in_transponder, self.channel.operating_obo)
-
-        # Compute C/I uplink from adjacent satellites
-        ci_uplink_adjacent_satellite = 50
-
-        # Compute C/I downlink from adjacent satellites
-        ci_downlink_adjacent_satellite = 50
-
-        # Compute C/I uplink from adjacent cells
-        ci_uplink_adjacent_cells = 50
-
-        # Compute C/I downlink from adjacent cells
-        ci_downlink_adjacent_cells = 50
-
-        # Compute total C/I uplink
-        ci_uplink_total = self.carrier_over_noise_total(ci_uplink_amplifier, ci_uplink_adjacent_satellite, ci_uplink_adjacent_cells)
-        ci_downlink_total = self.carrier_over_noise_total(ci_transponder_amplifier, ci_downlink_adjacent_satellite, ci_downlink_adjacent_cells)
-
-        # ---- C/N Total ----
-
-        cn_total_clear_sky = self.carrier_over_noise_total(cn_uplink_clear, cn_downlink_clear, ci_uplink_total, ci_downlink_total)
-        cn_total_rain_down = self.carrier_over_noise_total(cn_uplink_clear, cn_downlink_rain, ci_uplink_total, ci_downlink_total)
-        cn_total_rain_up = self.carrier_over_noise_total(cn_uplink_rain, cn_downlink_clear, ci_uplink_total, ci_downlink_total)
-        cn_total_rain_both = self.carrier_over_noise_total(cn_uplink_rain, cn_downlink_rain, ci_uplink_total, ci_downlink_total)
-
-        # ---- Capacity ----
-        # Compute link capacity (clear sky, up fade only, down fade only and both fade )
-        # in both MHz and Mbps
-
-        # Find modem application based on modem operation mode and type of channel (FWD/RTN)
-        if self.channel.is_forward:
-            application = self.modem_operation_mode.forward_application
-        elif self.channel.is_return:
-            application = self.modem_operation_mode.return_application
-        else:
-            raise LinkCalcError("Cannot identify channel type")
-
-        # Find best modulation for all cases
-        modulation_clear_sky = application.get_best_mcg(cn_total_clear_sky)
-        modulation_rain_down = application.get_best_mcg(cn_total_rain_down)
-        modulation_rain_up = application.get_best_mcg(cn_total_rain_up)
-        modulation_rain_both = application.get_best_mcg(cn_total_rain_both, link_margin=0.01)
-
-        # Find capacity for all cases
-        capacity_clear_sky = (self.bandwidth / application.rolloff_factor_for_calculation) * modulation_clear_sky.efficiency_for_calculation
-        capacity_rain_down = (self.bandwidth / application.rolloff_factor_for_calculation) * modulation_rain_down.efficiency_for_calculation
-        capacity_rain_up = (self.bandwidth / application.rolloff_factor_for_calculation) * modulation_rain_up.efficiency_for_calculation
-        capacity_rain_both = (self.bandwidth / application.rolloff_factor_for_calculation) * modulation_rain_both.efficiency_for_calculation
-
-
-        # Pick the MCG at both fade and calculate capacity. If the modem has no ACM function, let capacity
-        # at clear sky equals to capacity at both fade
-
-        # Else, pick MCG at clear sky and calculate capacity separately for clear sky condition.
-
-        # Seek the maximum total link availability if needed.
-
-        # --------------Record all parameters into the result object--------------------------
-
-        # Record uplink budget parameters
-        uplink.latitude = uplink_station.location.latitude
-        uplink.longitude = uplink_station.location.longitude
-        uplink.polarization = self.channel.uplink_beam.polarization
-        uplink.slant_range = GEOSYNCHRONOUS_ALTITUDE
-        uplink.frequency = uplink_frequency
-        uplink.elevation = self.channel.uplink_beam.satellite.elevation_angle(uplink_station.location.latitude,
-                                                                              uplink_station.location.longitude)
-        uplink.ifl = uplink_station.hpa.ifl
-        uplink.hpa_obo = uplink_station.hpa.output_backoff
-        uplink.upc = uplink_station.hpa.upc
-        uplink.antenna_diameter = uplink_station.antenna.diameter
-        uplink.antenna_efficiency = uplink_station.antenna.efficiency(uplink_frequency)
-        uplink.antenna_gain = uplink_station.antenna.gain(uplink.frequency)
-        uplink.hpa_full_power = uplink_station.hpa.output_power
-        uplink.hpa_output_power_per_carrier = uplink_eirp - uplink_station.antenna.gain(
-            uplink_frequency) - uplink_station.hpa.ifl + uplink_station.hpa.upc
-        uplink.spreading_loss = self.spreading_loss(GEOSYNCHRONOUS_ALTITUDE)
-        uplink.relative_contour = uplink_contour
-        uplink.gt = uplink_gt
+    def optimize_power(self):
+        # Find optimized EIRP if power optimization is true
         if self.power_optimization:
-            uplink.optimized_eirp = optimized_eirp
-        uplink.eirp = uplink_eirp
-        uplink.pfd = uplink_pfd
-        uplink.availability = uplink_availability
-        uplink.pointing_loss = self.pointing_loss()
-        uplink.xpol_loss = self.xpol_loss()
-        uplink.axial_ratio_loss = self.axial_ratio_loss()
-        uplink.path_loss = uplink_path_loss
-        uplink.cloud_attenuation = uplink_atten.cloud
-        uplink.gas_attenuation = uplink_atten.gas
-        uplink.scin_attenuation = uplink_atten.scin
-        uplink.rain_attenuation = uplink_atten.rain
-        uplink.noise_bandwidth = uplink_noise_bandwidth
+            self.uplink.optimized_pfd = self.channel.seek_optimized_pfd_uplink(self.bandwidth, self.uplink.gt)
 
-        # Record satellite parameters
-        sat = self.channel.uplink_beam.satellite
-        satellite.name = sat.name
-        satellite.channel = self.channel.name
-        satellite.orbital_slot = sat.orbital_slot
-        satellite.half_station_keeping_box = sat.half_station_keeping_box
-        satellite.channel_bandwidth = self.channel.bandwidth
-        satellite.peak_gt = self.channel.uplink_beam.peak_gt
-        satellite.channel_sfd = self.channel.sfd_channel_at_uplink_location(uplink_gt)
-        satellite.channel_input_backoff = self.channel.operating_ibo
-        satellite.channel_output_backoff = self.channel.operating_obo
-        satellite.channel_operating_mode = self.channel.operating_mode
-        satellite.carrier_output_backoff = self.channel.obo_per_carrier(uplink_pfd, uplink_gt, self.bandwidth)
-        satellite.deepin_per_carrier = self.channel.deepin_per_carrier(uplink_pfd, uplink_gt, self.bandwidth)
-        satellite.peak_saturated_eirp = self.channel.downlink_beam.peak_sat_eirp
-        satellite.gain_variation = 0
 
-        # Record downlink budget parameters
-        downlink.latitude = downlink_station.location.latitude
-        downlink.longitude = downlink_station.location.longitude
-        downlink.polarization = self.channel.downlink_beam.polarization
-        downlink.slant_range = GEOSYNCHRONOUS_ALTITUDE
-        downlink.frequency = downlink_frequency
-        downlink.elevation = self.channel.downlink_beam.satellite.elevation_angle(downlink_station.location.latitude,
-                                                                              downlink_station.location.longitude)
-        downlink.antenna_diameter = downlink_station.antenna.diameter
-        downlink.antenna_efficiency = downlink_station.antenna.efficiency(downlink_frequency)
-        downlink.antenna_gain = downlink_station.antenna.gain(downlink.frequency)
-        downlink.antenna_gt_clear = downlink_gt_clear_sky
-        downlink.antenna_gt_rain = downlink_gt_rain
-        downlink.relative_contour = downlink_contour
-        downlink.eirp_at_location = downlink_eirp_at_peak + downlink_contour
-        downlink.availability = downlink_availability
-        downlink.pointing_loss = self.pointing_loss()
-        downlink.xpol_loss = self.xpol_loss()
-        downlink.axial_ratio_loss = self.axial_ratio_loss()
-        downlink.path_loss = downlink_path_loss
-        downlink.cloud_attenuation = downlink_atten.cloud
-        downlink.gas_attenuation = downlink_atten.gas
-        downlink.scin_attenuation = downlink_atten.scin
-        downlink.rain_attenuation = downlink_atten.rain
-        downlink.noise_bandwidth = downlink_noise_bandwidth
+class Uplink:
+    def __init__(self, link):
+        self.link = link
+        self._station = None
+        self._lat = None
+        self._lon = None
+        self._pol = None
+        self._slant_range = None
+        self._freq = None
+        self._elevation = None
+        self._ifl = None
+        self._hpa_obo = None
+        self._upc = None
+        self._ant_diam = None
+        self._ant_eff = None
+        self._ant_gain = None
+        self._hpa_full_power = None
+        self._hpa_output_power_per_carrier = None
+        self._spreading_loss = None
+        self._relative_contour = None
+        self._peak_gt = None
+        self._gt = None
+        self._optimized_pfd = None
+        self._optimized_eirp = None
+        self._eirp = None
+        self._pfd = None
+        self._single_site_availability = None
+        self._availability = None
+        self._pointing_loss = None
+        self._xpol_loss = None
+        self._axial_ratio_loss = None
+        self._gain1m = None
+        self._path_loss = None
+        self._atten = None
+        self._cloud_atten = None
+        self._gas_atten = None
+        self._scin_atten = None
+        self._rain_atten = None
+        self._noise_bw = None
+        self._carrier_over_noise_clear_sky = None
+        self._carrier_over_noise_rain = None
+        self._carrier_over_interferences_adjacent_cells = None
+        self._carrier_over_interferences_adjacent_satellites = None
+        self._carrier_over_interferences_intermodulation = None
+        self._carrier_over_interferences_total = None
 
-        # Record to interferences results
-        uplink_interferences.adjacent_cells = ci_uplink_adjacent_cells
-        uplink_interferences.adjacent_satellite = ci_uplink_adjacent_satellite
-        uplink_interferences.intermodulation = ci_uplink_amplifier
-        downlink_interferences.adjacent_cells = ci_downlink_adjacent_cells
-        downlink_interferences.adjacent_satellite = ci_downlink_adjacent_satellite
-        downlink_interferences.intermodulation = ci_transponder_amplifier
+    @property
+    def station(self):
+        return self._station
 
-        # Record to C/N results
-        clear_sky.cn_uplink = cn_uplink_clear
-        clear_sky.cn_downlink = cn_downlink_clear
-        clear_sky.ci_uplink = ci_uplink_total
-        clear_sky.ci_downlink = ci_downlink_total
-        clear_sky.cn_total = cn_total_clear_sky
-        clear_sky.mcg = modulation_clear_sky
-        clear_sky.capacity = capacity_clear_sky
-        rain_down.cn_downlink = cn_downlink_rain
-        rain_down.cn_uplink = cn_uplink_clear
-        rain_down.ci_uplink = ci_uplink_total
-        rain_down.ci_downlink = ci_downlink_total
-        rain_down.cn_total = cn_total_rain_down
-        rain_down.mcg = modulation_rain_down
-        rain_down.capacity = capacity_rain_down
-        rain_up.cn_uplink = cn_uplink_rain
-        rain_up.cn_downlink = cn_downlink_clear
-        rain_up.ci_uplink = ci_uplink_total
-        rain_up.ci_downlink = ci_downlink_total
-        rain_up.cn_total = cn_total_rain_up
-        rain_up.mcg = modulation_rain_up
-        rain_up.capacity = capacity_rain_up
-        rain_both.cn_uplink = cn_uplink_rain
-        rain_both.cn_downlink = cn_downlink_rain
-        rain_both.ci_uplink = ci_uplink_total
-        rain_both.ci_downlink = ci_downlink_total
-        rain_both.cn_total = cn_total_rain_both
-        rain_both.mcg = modulation_rain_both
-        rain_both.capacity = capacity_rain_both
+    @station.setter
+    def station(self, value):
+        self._station = value
 
-        # Record to Carrier results
-        carrier.bandwidth = self.bandwidth
+    @property
+    def relative_contour(self):
+        if self._relative_contour is None:
+            self._relative_contour = self.link.channel.uplink_beam.get_contour(self.latitude, self.longitude)
+        return self._relative_contour
 
-        # New algorithm here
-        changes = 1 + 1
+    @relative_contour.setter
+    def relative_contour(self, value):
+        self._relative_contour = value
 
-        return self.result
+    @property
+    def single_site_availability(self):
+        if self._single_site_availability is None:
+            self._single_site_availability = 99.5
+        return self._single_site_availability
 
-    def validate(self):
-        """
-        Validates the input parameters
-        """
-        if self.num_carriers_in_transponder < 0:
-            raise LinkCalcError("Number of carriers in the transponder {0} cannot be less than zero.".format(
-                self.channel.transponder.name))
-        if self.power_overused < 0:
-            raise LinkCalcError("Power overused cannot be less than zero.")
-        if self.bandwidth > self.channel.bandwidth:
-            raise LinkCalcError(
-                "Input bandwidth ({0} MHz) is bigger than the channel bandwidth ({1}) MHz.".format(str(self.bandwidth),
-                                                                                                   str(
-                                                                                                       self.channel.bandwidth)))
-        if self.bandwidth < 0:
-            raise LinkCalcError("Input bandwidth ({0} MHz) cannot be less than zero.".format(str(self.bandwidth)))
-        if self.force_operating_mode:
-            self.channel.transponder.validate_transponder_mode(self.force_operating_mode)
+    @single_site_availability.setter
+    def single_site_availability(self, value):
+        self._single_site_availability = value
 
-    def spreading_loss(self, slant_range):
-        """
-        Computes spreading loss from slant range (km)
-        """
-        return 10 * log10(4 * pi * (slant_range * 10 ** 3) ** 2)
+    @property
+    def optimized_pfd(self):
+        return self._optimized_pfd
 
-    def gain_1m(self, frequency):
-        """
-        Computes gain of 1 sq.meter (dBi/m^2)
-        """
-        return 10 * log10(4 * pi * (1 / self.wavelength(frequency) ** 2))
+    @optimized_pfd.setter
+    def optimized_pfd(self, value):
+        self._optimized_pfd = value
 
-    def path_loss(self, slant_range, frequency):
-        """
-        Computes path loss of this link
-        """
-        return self.spreading_loss(slant_range) + self.gain_1m(frequency)
+    @property
+    def latitude(self):
+        if self._lat is None:
+            self._lat = self.station.location.latitude
+        return self._lat
 
+    @property
+    def longitude(self):
+        if self._lon is None:
+            self._lon = self.station.location.longitude
+        return self._lon
+
+    @property
+    def polarization(self):
+        if self._pol is None:
+            self._pol = self.link.channel.uplink_beam.polarization
+        return self._pol
+
+    @property
+    def slant_range(self):
+        #TODO is None: Fixed this
+        if self._slant_range is None:
+            self._slant_range = GEOSYNCHRONOUS_ALTITUDE
+        return self._slant_range
+
+    @property
+    def frequency(self):
+        if self._freq is None:
+            self._freq = self.link.channel.uplink_center_frequency
+        return self._freq
+
+    @property
+    def elevation(self):
+        if self._elevation is None:
+            self._elevation = self.link.channel.uplink_beam.satellite.elevation_angle(self.latitude, self.longitude)
+        return self._elevation
+
+    @property
+    def ifl(self):
+        if self._ifl is None:
+            self._ifl = self.station.hpa.ifl
+        return self._ifl
+
+    @property
+    def hpa_obo(self):
+        if self._hpa_obo is None:
+            self._hpa_obo = self.station.hpa.output_backoff
+        return self._hpa_obo
+
+    @property
+    def upc(self):
+        if self._upc is None:
+            self._upc = self.station.hpa.upc
+        return self._upc
+
+    @property
+    def antenna_diameter(self):
+        if self._ant_diam is None:
+            self._ant_diam = self.station.antenna.diameter
+        return self._ant_diam
+
+    @property
+    def antenna_efficiency(self):
+        if self._ant_eff is None:
+            self._ant_eff = self.station.antenna.efficiency(self.frequency)
+        return self._ant_eff
+
+    @property
+    def antenna_gain(self):
+        if self._ant_gain is None:
+            self._ant_gain = self.station.antenna.gain(self.frequency)
+        return self._ant_gain
+
+    @property
+    def hpa_full_power(self):
+        if self._hpa_full_power is None:
+            self._hpa_full_power = self.station.hpa.output_power
+        return self._hpa_full_power
+
+    @property
+    def hpa_output_power_per_carrier(self):
+        if self._hpa_output_power_per_carrier is None:
+            self._hpa_output_power_per_carrier = self.eirp - self.antenna_gain - self.ifl + self.upc
+        return self._hpa_output_power_per_carrier
+
+    @property
+    def peak_gt(self):
+        if self._peak_gt is None:
+            self._peak_gt = self.link.channel.uplink_beam.peak_gt
+        return self._peak_gt
+
+    @property
+    def gt(self):
+        if self._gt is None:
+            self._gt = self.peak_gt + self.relative_contour
+        return self._gt
+
+    @property
+    def optimized_eirp(self):
+        if self._optimized_eirp is None:
+            if self.optimized_pfd is not None:
+                self._optimized_eirp = self.optimized_pfd + self.spreading_loss + self.link.power_overused
+        return self._optimized_eirp
+
+    @property
+    def eirp(self):
+        if self._eirp is None:
+            station_eirp = self.station.uplink_eirp(self.frequency)
+            if self._optimized_eirp is None:  # No EIRP optimization
+                self._eirp = station_eirp
+            elif self._optimized_eirp > station_eirp:
+                self._eirp = station_eirp
+            else:
+                self._eirp = self.optimized_eirp
+        return self._eirp
+
+    @property
+    def pfd(self):
+        if self._pfd is None:
+            self._pfd = self.eirp - self.spreading_loss
+        return self._pfd
+
+    @property
+    def spreading_loss(self):
+        if self._spreading_loss is None:
+            self._spreading_loss = 10 * log10(4 * pi * (self.slant_range * 10 ** 3) ** 2)
+        return self._spreading_loss
+
+    @property
     def pointing_loss(self):
         # TODO: Write this function
-        return 0.6
+        if self._pointing_loss is None:
+            self._pointing_loss = 0.6
+        return self._pointing_loss
 
+    @property
     def xpol_loss(self):
-        return 0.1
+        if self._xpol_loss is None:
+            self._xpol_loss = 0
+        return self._xpol_loss
 
+    @property
     def axial_ratio_loss(self):
-        return 0
+        if self._axial_ratio_loss is None:
+            self._axial_ratio_loss = 0
+        return self._axial_ratio_loss
 
-    def noise_bandwidth(self, bandwidth):
-        """
-        Returns noise bandwidth from given bandwidth in MHz
-        """
-        return 10 * log10(bandwidth * 10 ** 6)
+    @property
+    def gain1m(self):
+        if self._gain1m is None:
+            self._gain1m = 10 * log10(4 * pi * (1 / wavelength(self.frequency) ** 2))
+        return self._gain1m
 
-    def carrier_over_noise(self):
+    @property
+    def path_loss(self):
+        if self._path_loss is None:
+            self._path_loss = self.spreading_loss + self.gain1m
+        return self._path_loss
+
+    @property
+    def availability(self):
         pass
 
-    def carrier_over_noise_total(self, cn_uplink, cn_downlink, ci_uplink=50, ci_downlink=50):
-        """
-        Returns C/N total from C/N uplink, C/N downlink, C/I uplink and C/N downlink
-        """
-        return self.cn_operation(cn_uplink, cn_downlink, ci_uplink, ci_downlink)
+    @property
+    def atten(self):
+        if self._atten is None:
+            self._atten = Attenuation(self.frequency, self.elevation, self.antenna_diameter, self.polarization, self.single_site_availability, self.latitude, self.longitude, self.antenna_efficiency)
+        return self._atten
+
+    @property
+    def cloud_atten(self):
+        if self._cloud_atten is None:
+            self._cloud_atten = self.atten.cloud
+        return self._cloud_atten
+
+    @property
+    def scin_atten(self):
+        if self._scin_atten is None:
+            self._scin_atten = self.atten.scin
+        return self._scin_atten
+
+    @property
+    def gas_atten(self):
+        if self._gas_atten is None:
+            self._gas_atten = self.atten.gas
+        return self._gas_atten
+
+    @property
+    def rain_atten(self):
+        if self._rain_atten is None:
+            self._rain_atten = self.atten.rain
+        return self._rain_atten
+
+    @property
+    def noise_bandwidth(self):
+        if self._noise_bw is None:
+            self._noise_bw = 10 * log10(self.link.bandwidth * 10 ** 6)
+        return self._noise_bw
+
+    @property
+    def carrier_over_noise_clear_sky(self):
+        if self._carrier_over_noise_clear_sky is None:
+            self._carrier_over_noise_clear_sky = self.eirp + self.gt - self.path_loss - self.noise_bandwidth - BOLTZMANN_CONSTANT - self.atten.total_clear_sky
+        return self._carrier_over_noise_clear_sky
+
+    @property
+    def carrier_over_noise_rain(self):
+        if self._carrier_over_noise_rain is None:
+            self._carrier_over_noise_rain = self.eirp + self.gt - self.path_loss - self.noise_bandwidth - BOLTZMANN_CONSTANT - self.atten.total_rain
+        return self._carrier_over_noise_rain
+
+    @property
+    def carrier_over_interferences_adjacent_cells(self):
+        if self._carrier_over_interferences_adjacent_cells is None:
+            self._carrier_over_interferences_adjacent_cells = 50
+        return self._carrier_over_interferences_adjacent_cells
+
+    @property
+    def carrier_over_interferences_adjacent_satellites(self):
+        if self._carrier_over_interferences_adjacent_satellites is None:
+            self._carrier_over_interferences_adjacent_satellites = 50
+        return self._carrier_over_interferences_adjacent_satellites
+
+    @property
+    def carrier_over_interferences_intermodulation(self):
+        if self._carrier_over_interferences_intermodulation is None:
+            self._carrier_over_interferences_intermodulation = 50
+        return self._carrier_over_interferences_intermodulation
+
+    @property
+    def carrier_over_interferences_total(self):
+        if self._carrier_over_interferences_total is None:
+            self._carrier_over_interferences_total = cn_operation(self.carrier_over_interferences_adjacent_cells, self.carrier_over_interferences_adjacent_satellites, self.carrier_over_interferences_intermodulation)
+        return self._carrier_over_interferences_total
+
+
+class Satellite:
+    def __init__(self, link):
+        self.link = link
+        self._name = None
+        self._channel_name = None
+        self._orbital_slot = None
+        self._half_station_keeping_box = None
+        self._channel_bandwidth = None
+        self._peak_gt = None
+        self._channel_sfd = None
+        self._channel_input_backoff = None
+        self._channel_output_backoff = None
+        self._channel_operating_mode = None
+        self._carrier_output_backoff = None
+        self._deepin_per_carrier = None
+        self._peak_saturated_eirp = None
+        self._gain_variation = None
+        self._peak_eirp_per_carrier = None
+
+    @property
+    def name(self):
+        if self._name is None:
+            self._name = self.link.channel.uplink_beam.satellite.name
+        return self._name
+
+    @property
+    def channel_name(self):
+        if self._channel_name is None:
+            self._channel_name = self.link.channel.name
+        return self._channel_name
+
+    @property
+    def orbital_slot(self):
+        if self._orbital_slot is None:
+            self._orbital_slot = self.link.channel.uplink_beam.satellite.orbital_slot
+        return self._orbital_slot
+
+    @property
+    def half_station_keeping_box(self):
+        if self._half_station_keeping_box is None:
+            self._half_station_keeping_box = self.link.channel.uplink_beam.satellite.half_station_keeping_box
+        return self._half_station_keeping_box
+
+    @property
+    def channel_bandwidth(self):
+        if self._channel_bandwidth is None:
+            self._channel_bandwidth = self.link.channel.bandwidth
+        return self._channel_bandwidth
+
+    @property
+    def peak_gt(self):
+        if self._peak_gt is None:
+            self._peak_gt = self.link.channel.uplink_beam.peak_gt
+        return self._peak_gt
+
+    @property
+    def channel_sfd(self):
+        if self._channel_sfd is None:
+            self._channel_sfd = self.link.channel.sfd_channel_at_uplink_location(self.link.uplink.gt)
+        return self._channel_sfd
+
+    @property
+    def channel_input_backoff(self):
+        if self._channel_input_backoff is None:
+            self._channel_input_backoff = self.link.channel.operating_ibo
+        return self._channel_input_backoff
+
+    @property
+    def channel_output_backoff(self):
+        if self._channel_output_backoff is None:
+            self._channel_output_backoff = self.link.channel.operating_obo
+        return self._channel_output_backoff
+
+    @property
+    def channel_operating_mode(self):
+        if self._channel_operating_mode is None:
+            self._channel_operating_mode = self.link.channel.operating_mode
+        return self._channel_operating_mode
+
+    @property
+    def carrier_output_backoff(self):
+        if self._carrier_output_backoff is None:
+            self._carrier_output_backoff = self.link.channel.obo_per_carrier(self.link.uplink.pfd, self.link.uplink.gt, self.link.bandwidth)
+        return self._carrier_output_backoff
+
+    @property
+    def deepin_per_carrier(self):
+        if self._deepin_per_carrier is None:
+            self._deepin_per_carrier = self.link.channel.deepin_per_carrier(self.link.uplink.pfd, self.link.uplink.gt, self.link.bandwidth)
+        return self._deepin_per_carrier
+
+    @property
+    def peak_saturated_eirp(self):
+        if self._peak_saturated_eirp is None:
+            self._peak_saturated_eirp = self.link.channel.downlink_beam.peak_sat_eirp
+        return self._peak_saturated_eirp
+
+    @property
+    def gain_variation(self):
+        if self._gain_variation is None:
+            self._gain_variation = 0
+        return self._gain_variation
+
+    @property
+    def peak_eirp_per_carrier(self):
+        if self._peak_eirp_per_carrier is None:
+            self._peak_eirp_per_carrier = self.peak_saturated_eirp + self.carrier_output_backoff
+        return self._peak_eirp_per_carrier
+
+
+class Downlink:
+    def __init__(self, link):
+        self.link = link
+        self._station = None
+        self._lat = None
+        self._lon = None
+        self._pol = None
+        self._slant_range = None
+        self._freq = None
+        self._elevation = None
+        self._ant_diam = None
+        self._ant_gain = None
+        self._ant_eff = None
+        self._ant_gain = None
+        self._ant_gt_clear = None
+        self._ant_gt_rain = None
+        self._relative_contour = None
+        self._eirp_at_location = None
+        self._single_site_availability = None
+        self._pointing_loss = None
+        self._xpol_loss = None
+        self._axial_ratio_loss = None
+        self._spreading_loss = None
+        self._gain1m = None
+        self._path_loss = None
+        self._atten = None
+        self._cloud_atten = None
+        self._gas_atten = None
+        self._scin_atten = None
+        self._rain_atten = None
+        self._noise_bw = None
+        self._carrier_over_noise_clear_sky = None
+        self._carrier_over_noise_rain = None
+        self._carrier_over_interferences_adjacent_cells = None
+        self._carrier_over_interferences_adjacent_satellites = None
+        self._carrier_over_interferences_intermodulation = None
+        self._carrier_over_interferences_total = None
+
+    @property
+    def station(self):
+        return self._station
+
+    @station.setter
+    def station(self, value):
+        self._station = value
+
+    @property
+    def relative_contour(self):
+        if self._relative_contour is None:
+            self._relative_contour = self.link.channel.downlink_beam.get_contour(self.latitude, self.longitude)
+        return self._relative_contour
+
+    @relative_contour.setter
+    def relative_contour(self, value):
+        self._relative_contour = value
+
+    @property
+    def latitude(self):
+        if self._lat is None:
+            self._lat = self.station.location.latitude
+        return self._lat
+
+    @property
+    def longitude(self):
+        if self._lon is None:
+            self._lon = self.station.location.longitude
+        return self._lon
+
+    @property
+    def polarization(self):
+        if self._pol is None:
+            self._pol = self.link.channel.downlink_beam.polarization
+        return self._pol
+
+    @property
+    def slant_range(self):
+        if self._slant_range is None:
+            self._slant_range = GEOSYNCHRONOUS_ALTITUDE
+        return self._slant_range
+
+    @property
+    def frequency(self):
+        if self._freq is None:
+            self._freq = self.link.channel.downlink_center_frequency
+        return self._freq
+
+    @property
+    def elevation(self):
+        if self._elevation is None:
+            self._elevation = self.link.channel.downlink_beam.satellite.elevation_angle(self.latitude, self.longitude)
+        return self._elevation
+
+    @property
+    def antenna_diameter(self):
+        if self._ant_diam is None:
+            self._ant_diam = self.station.antenna.diameter
+        return self._ant_diam
+
+    @property
+    def antenna_efficiency(self):
+        if self._ant_eff is None:
+            self._ant_eff = self.station.antenna.efficiency(self.frequency)
+        return self._ant_eff
+
+    @property
+    def antenna_gain(self):
+        if self._ant_gain is None:
+            self._ant_gain = self.station.antenna.gain(self.frequency)
+        return self._ant_gain
+
+    @property
+    def antenna_gt_clear(self):
+        if self._ant_gt_clear is None:
+            self._ant_gt_clear = self.station.antenna.gt(self.frequency, self.elevation)
+        return self._ant_gt_clear
+
+    @property
+    def antenna_gt_rain(self):
+        if self._ant_gt_rain is None:
+            #TODO : Modify this
+            noise_temp_at_rain = 220
+            self._ant_gt_rain = self.station.antenna.gt(self.frequency, self.elevation, noise_temp_at_rain)
+        return self._ant_gt_rain
+
+    @property
+    def eirp_at_location(self):
+        if self._eirp_at_location is None:
+            self._eirp_at_location = self.link.satellite.peak_eirp_per_carrier + self.relative_contour
+        return self._eirp_at_location
+
+    @property
+    def single_site_availability(self):
+        if self._single_site_availability is None:
+            self._single_site_availability = 99.5
+        return self._single_site_availability
+
+    @property
+    def pointing_loss(self):
+        if self._pointing_loss is None:
+            #TODO: Write this function
+            self._pointing_loss = 0.6
+        return self._pointing_loss
+
+    @property
+    def xpol_loss(self):
+        if self._xpol_loss is None:
+            self._xpol_loss = 0
+        return self._xpol_loss
+
+    @property
+    def axial_ratio_loss(self):
+        if self._axial_ratio_loss is None:
+            self._axial_ratio_loss = 0
+        return self._axial_ratio_loss
+
+    @property
+    def gain1m(self):
+        if self._gain1m is None:
+            self._gain1m = 10 * log10(4 * pi * (1 / wavelength(self.frequency) ** 2))
+        return self._gain1m
+
+    @property
+    def spreading_loss(self):
+        if self._spreading_loss is None:
+            self._spreading_loss = 10 * log10(4 * pi * (self.slant_range * 10 ** 3) ** 2)
+        return self._spreading_loss
+
+    @property
+    def path_loss(self):
+        if self._path_loss is None:
+            self._path_loss = self.spreading_loss + self.gain1m
+        return self._path_loss
+
+    @property
+    def atten(self):
+        if self._atten is None:
+            self._atten = Attenuation(self.frequency, self.elevation, self.antenna_diameter, self.polarization, self.single_site_availability, self.latitude, self.longitude, self.antenna_efficiency)
+        return self._atten
+
+    @property
+    def cloud_atten(self):
+        if self._cloud_atten is None:
+            self._cloud_atten = self.atten.cloud
+        return self._cloud_atten
+
+    @property
+    def gas_atten(self):
+        if self._gas_atten is None:
+            self._gas_atten = self.atten.gas
+        return self._gas_atten
+
+    @property
+    def scin_atten(self):
+        if self._scin_atten is None:
+            self._scin_atten = self.atten.scin
+        return self._scin_atten
+
+    @property
+    def rain_atten(self):
+        if self._rain_atten is None:
+            self._rain_atten = self.atten.rain
+        return self._rain_atten
+
+    @property
+    def noise_bandwidth(self):
+        if self._noise_bw is None:
+            self._noise_bw = 10 * log10(self.link.bandwidth * 10 ** 6)
+        return self._noise_bw
+
+    @property
+    def carrier_over_noise_clear_sky(self):
+        if self._carrier_over_noise_clear_sky is None:
+            self._carrier_over_noise_clear_sky = self.eirp_at_location + self.antenna_gt_clear - self.path_loss - self.noise_bandwidth - BOLTZMANN_CONSTANT - self.atten.total_clear_sky
+        return self._carrier_over_noise_clear_sky
+
+    @property
+    def carrier_over_noise_rain(self):
+        if self._carrier_over_noise_rain is None:
+            self._carrier_over_noise_rain = self.eirp_at_location + self.antenna_gt_rain - self.path_loss - self.noise_bandwidth - BOLTZMANN_CONSTANT - self.atten.total_rain
+        return self._carrier_over_noise_rain
+
+    @property
+    def carrier_over_interferences_adjacent_cells(self):
+        if self._carrier_over_interferences_adjacent_cells is None:
+            self._carrier_over_interferences_adjacent_cells = 50
+        return self._carrier_over_interferences_adjacent_cells
+
+    @property
+    def carrier_over_interferences_adjacent_satellites(self):
+        if self._carrier_over_interferences_adjacent_satellites is None:
+            self._carrier_over_interferences_adjacent_satellites = 50
+        return self._carrier_over_interferences_adjacent_satellites
+
+    @property
+    def carrier_over_interferences_intermodulation(self):
+        if self._carrier_over_interferences_intermodulation is None:
+            self._carrier_over_interferences_intermodulation = 50
+        return self._carrier_over_interferences_intermodulation
+
+    @property
+    def carrier_over_interferences_total(self):
+        if self._carrier_over_interferences_total is None:
+            self._carrier_over_interferences_total = cn_operation(self.carrier_over_interferences_adjacent_cells, self.carrier_over_interferences_adjacent_satellites, self.carrier_over_interferences_intermodulation)
+        return self._carrier_over_interferences_total
+
+
+class Carrier:
+    def __init__(self, link, condition, cn_total, link_margin=None):
+        self.link = link
+        self.condition = condition
+        self.cn_total = cn_total
+        self.link_margin = link_margin
+        if link_margin is None:
+            self.link_margin = 0.01
+        self._application = None
+        self._modulation = None
+        self._capacity_per_carrier = None
+
+    @property
+    def application(self):
+        if self._application is None:
+            # Find modem application based on modem operation mode and type of channel (FWD/RTN)
+            if self.link.channel.is_forward:
+                self._application = self.link.modem_operation_mode.forward_application
+            elif self.link.channel.is_return:
+                self._application = self.link.modem_operation_mode.return_application
+            else:
+                raise LinkCalcError("Cannot identify channel type")
+        return self._application
+
+    @property
+    def modulation(self):
+        if self._modulation is None:
+            self._modulation = self.application.get_best_mcg(self.cn_total, self.link_margin)
+        return self._modulation
+
+    @property
+    def capacity_per_carrier(self):
+        if self._capacity_per_carrier is None:
+            self._capacity_per_carrier = (self.link.bandwidth / self.application.rolloff_factor_for_calculation) * self.modulation.efficiency_for_calculation
+        return self._capacity_per_carrier
 
 
 
-    @staticmethod
-    def wavelength(frequency):
-        return SPEED_OF_LIGHT / (frequency * 10 ** 9)
 
-
-    @staticmethod
-    def cn_operation(*args):
-        result = 0
-        for cn in args:
-            result += 1 / (10.0 ** (cn / 10.0))
-        return -10 * log10(result)
