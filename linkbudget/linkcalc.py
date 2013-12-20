@@ -460,7 +460,7 @@ class Link:
         return 0.1
 
     def axial_ratio_loss(self):
-        return 20 - 20
+        return 0
 
     def noise_bandwidth(self, bandwidth):
         """
@@ -469,7 +469,7 @@ class Link:
         return 10 * log10(bandwidth * 10 ** 6)
 
     def carrier_over_noise(self):
-        return 30
+        pass
 
     def carrier_over_noise_total(self, cn_uplink, cn_downlink, ci_uplink=50, ci_downlink=50):
         """

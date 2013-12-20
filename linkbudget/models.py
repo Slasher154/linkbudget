@@ -385,7 +385,8 @@ class Channel(models.Model):
     )
     type = models.CharField(max_length=30, choices=CHANNEL_TYPE_CHOICES)
     default_gateway = models.ForeignKey("Gateway", null=True, blank=True, help_text="Default gateway for this channel.")
-    
+
+
     def seek_optimized_pfd_uplink(self, carrier_bandwidth, uplink_gt):
         """
         Seek an optimized PFD uplink of the uplink station
@@ -466,6 +467,7 @@ class Channel(models.Model):
 
     @property
     def operating_mode(self):
+        self._operating_mode = self.transponder.primary_mode
         return self._operating_mode
 
     @operating_mode.setter
